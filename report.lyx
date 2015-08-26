@@ -1,0 +1,8736 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass report
+\begin_preamble
+\usepackage{fullpage}
+\usepackage{mciteplus}
+\usepackage{floatpag}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% disable errors for multiple crossrefs to same collection
+\mciteErrorOnUnknownfalse
+
+% remove page numbers from float pages
+\floatpagestyle{empty}
+
+
+
+%%% BBOB
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%    PREAMBLE   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{subfig}
+%\captionsetup[subfloat]{labelformat=empty,font=normalsize,position=top}
+%%%%%%%%%%%%%%%%%%%%%%   END OF PREAMBLE   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% TO BE EDITED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% rungeneric.py writes data into a subfolder of ppdata
+\newcommand{\bbobdatapath}{ppdata/} % default output folder of rungeneric.py
+\input{\bbobdatapath bbob_pproc_commands.tex} % provide default of algname and algfolder
+% \renewcommand{\algname}{MYNAME}  % name of algorithm as it should appear in the text
+% \renewcommand{\algfolder}{ABC/} % subfolder of \bbobdatapath for processed algorithm
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{{\bbobdatapath\algfolder}}
+
+\newcommand{\DIM}{\ensuremath{\mathrm{DIM}}}
+\newcommand{\ERT}{\ensuremath{\mathrm{ERT}}}
+\newcommand{\FEvals}{\ensuremath{\mathrm{FEvals}}}
+\newcommand{\nruns}{\ensuremath{\mathrm{Nruns}}}
+\newcommand{\Dfb}{\ensuremath{\Delta f_{\mathrm{best}}}}
+\newcommand{\Df}{\ensuremath{\Delta f}}
+\newcommand{\nbFEs}{\ensuremath{\mathrm{\#FEs}}}
+\newcommand{\fopt}{\ensuremath{f_\mathrm{opt}}}
+\newcommand{\ftarget}{\ensuremath{f_\mathrm{t}}}
+\newcommand{\CrE}{\ensuremath{\mathrm{CrE}}}
+ \newcommand{\rot}[2][2.5]{
+  \hspace*{-3.5\baselineskip}%
+  \begin{rotate}{90}\hspace{#1em}#2
+  \end{rotate}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language british
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize a4paper
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Optimising High-Dimensional Black-Box Functions with Gaussian Processes
+\end_layout
+
+\begin_layout Author
+David A Roberts #42008921
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Supervisor:
+\emph default
+ Associate Professor Marcus Gallagher
+\begin_inset Newline newline
+\end_inset
+
+School of ITEE, University of Queensland
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\E}{\operatorname{\mathbb{E}}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+This report describes a simple Gaussian process-based optimisation model,
+ with a particular emphasis on discussing its strengths and weaknesses.
+ We begin by formally defining the model and outlining the necessary implementat
+ion details that need to be overcome.
+ In addition to discussing the assumptions and approximation techniques
+ utilised during this project, a number of potential variations on these
+ are also suggested.
+ Following this, experimental results are presented, including a brief and
+ informal analysis of the behaviour of the model, as well as a slightly
+ more rigorous evaluation on the black-box optimisation benchmark (BBOB).
+ Although the results are promising, there are a number of practical deficiencie
+s that prevent the model from being a competitive global optimiser at the
+ current time.
+ The report concludes with a number of possible directions for future research,
+ in the hopes that Bayesian optimisation models will become a more competitive
+ and practical option.
+\end_layout
+
+\begin_layout Abstract
+\begin_inset VSpace 1in
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+
+\emph on
+Disclaimer:
+\emph default
+ The potential research directions suggested in this report should be considered
+ entirely speculative, and although the author has attempted to review the
+ relevant literature, time constraints meant that this was anything but
+ exhaustive, and therefore some (or all) may have already been researched
+ in the past.
+ Any lack of citations, beyond what is considered to be common knowledge,
+ does not necessarily indicate original ideas by the author, merely that
+ he is as of yet unaware of any references pertaining to these issues.
+\end_layout
+
+\begin_layout Abstract
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+\begin_inset VSpace 5cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename shouldnt_be_hard.png
+	lyxscale 45
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+
+\size footnotesize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://xkcd.com/1349/
+\end_layout
+
+\end_inset
+
+
+\size default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Standard
+Global optimisation, and in particular black-box optimisation, can be generally
+ described as the problem of maximising (or minimising) an unknown function,
+ known as the 
+\emph on
+objective function
+\emph default
+, by sampling its value at a number of points.
+ Function evaluations are useless on their own though, so one also has to
+ make certain assumptions about the function.
+ At the very least, this includes the assumption that the function is 
+\begin_inset Quotes eld
+\end_inset
+
+smooth
+\begin_inset Quotes erd
+\end_inset
+
+ in some sense, but also that the overall structure of the function is relativel
+y simple.
+ This is not to say that the function itself may not be complex, but all
+ information about this complexity should be derived from the observations
+ rather than prior assumptions.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This is the same reason why one would have reservations about using an optimiser
+ that contained huge hard-coded lookup tables, for example.
+ One might also draw an analogy to the laws of physics, which are quite
+ simple relative to the emergent complexity of the universe.
+\end_layout
+
+\end_inset
+
+ These prior assumptions may also be educated by what we have observed about
+ this or similar functions in the past.
+ In addition to this, we can assign problem-dependent preferences to different
+ potential outcomes --- for example the quality of the maximum may be much
+ more important than the number of function evaluations required, or 
+\emph on
+vice versa
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+Bayesian methods provide an elegant way of encoding these prior assumptions
+ and preferences.
+ Information about the structure of a function can be encoded by a 
+\emph on
+prior distribution
+\emph default
+, which is a probability distribution over the space of possible objective
+ functions, also known as a 
+\emph on
+stochastic process
+\emph default
+.
+ A particularly convenient class of priors is that of the 
+\emph on
+Gaussian processes
+\emph default
+ (GPs) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "rasmussen2006gaussian"
+
+\end_inset
+
+.
+ Preferences between different goals can be encoded by a 
+\emph on
+utility function
+\emph default
+, which assigns a numerical value to each potential outcome.
+ Decisions can then be made in an arguably optimal manner by maximising
+ the expectation of this utility with respect to the 
+\emph on
+posterior distribution
+\emph default
+ induced by the prior and any observed data.
+\end_layout
+
+\begin_layout Standard
+The purpose of this project was to determine whether GP-based optimisation
+ (GPO) can be successfully applied to high-dimensional
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Where we roughly define 
+\begin_inset Quotes eld
+\end_inset
+
+high-dimensional
+\begin_inset Quotes erd
+\end_inset
+
+ to be at least beyond single-digits.
+\end_layout
+
+\end_inset
+
+ objective functions.
+ In principle, GPs should be a perfect fit to this problem, as they do not
+ care about the dimensionality of the space 
+\emph on
+per se
+\emph default
+, but only the correlation structure of the datapoints.
+ Nonetheless, some perceive GPO to be either inherently intractable or simply
+ incapable of obtaining decent performance in high dimensions.
+ A number of difficulties in implementing GPO were encountered during this
+ project, which could be influencing this perception.
+ These are outlined later in the report, along with potential directions
+ for future research that could reduce their impact.
+\end_layout
+
+\begin_layout Section
+The Model
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{alignat*}{3}
+ & \mathbf{maximise} & \E & \, U & \triangleright\text{ expected utility}\\
+ & \mathbf{subject\ to} & f & \sim\mathcal{N}(\mu,\Sigma) & \triangleright\text{ objective\ function\ with GP prior}\\
+ &  & \mu(\cdot) & =0 & \triangleright\text{ zero mean}\\
+ &  & \Sigma(\cdot,\cdot) & =K_{\text{SE}}(\cdot,\cdot;\boldsymbol{\theta}) & \triangleright\text{ squared exponential kernel}\\
+ &  & \boldsymbol{\theta} & \sim\mathcal{U}(0,+\infty)^{D} & \triangleright\text{ hyper-params with flat prior}\\
+ &  & U & =f(x^{*}) & \triangleright\text{ utility function}\\
+ &  & y_{t} & =f(x_{t}),\quad t\leq N & \triangleright\text{ observation model}\\
+\\
+ & \mathbf{with\ actions} & X & =\{x_{t}\in\mathbb{R}^{D}:t\leq N\} & \triangleright\text{ sampled points}\\
+ &  & x^{*} & \in X & \triangleright\text{ reported maximiser}\\
+ & \mathbf{and\ observations} & Y & =\{y_{t}\in\mathbb{R}:t\leq N\} & \triangleright\text{ observed function values}\\
+ &  & D & \in\{1,2,3,5,10,20\} & \triangleright\text{ dimensionality}\\
+ &  & N & \propto D & \triangleright\text{ function\ evaluation\ budget}
+\end{alignat*}
+
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+The GPO model considered for this project
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:pp"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This project mainly focused on the model described by the probabilistic
+ program shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:pp"
+
+\end_inset
+
+.
+ This is quite a simple model --- much more sophisticated variations are
+ entirely possible, and are likely to offer significant performance gains.
+ However, this model was chosen as it embodied enough of the features commonly
+ seen in GPO models 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BOtut2010,PBOML2012,FreanBoyle2008"
+
+\end_inset
+
+, whilst being simple enough to implement with minimal difficulty within
+ the time constraints of the project.
+ The individual components of the model, as well as justifications for why
+ they where chosen over other possible variations, will be discussed in
+ more detail in the following chapter.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It should be noted that the utility function defined in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:pp"
+
+\end_inset
+
+ is in fact incomplete, as it does not make any reference to computational
+ resource usage.
+ As written, the model specifies that we are willing to spend arbitrary
+ amounts of computational resources in order to make exact inferences and
+ decisions.
+ Clearly this is not the case in practice, as fast approximations are preferred
+ even if they sacrifice a small amount of accuracy or certainty.
+ Our 
+\emph on
+actual
+\emph default
+ utility function --- the one residing within our skull --- penalises resources
+ consumed by executing the program, hence more accurately reflecting the
+ relative importance we place on correctness and computational efficiency.
+ Updating the GPO model to better imitate this would allow these two factors
+ to be optimally balanced in a principled manner, by selecting the appropriate
+ approximations to combine in the implementation in order to maximise the
+ expected utility of executing the generated program.
+ However, this was beyond the scope of this project, so a number of common
+ approximations were instead selected on an 
+\emph on
+ad hoc
+\emph default
+ basis.
+\end_layout
+
+\begin_layout Standard
+A number of implementation details (including selecting appropriate approximatio
+ns) need to solved, in order to translate this abstract probabilistic program
+ into a concrete program that can be (tractably) run on a computer:
+\end_layout
+
+\begin_layout Itemize
+fast techniques and approximations for computing Gaussian conditional distributi
+ons, in particular for (pseudo-)inverting large covariance matrices (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:gauss-cond"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+a sampler or optimiser for performing inference of any unknown quantities,
+ particularly GP hyper-parameters (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:hyper-inf"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+a decomposition of the full maximum expected utility problem into an approximate
+ decision policy, which may itself require an optimiser for computing the
+ preferred actions (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:utility"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+any algebraic manipulations necessary to be able to compute required quantities
+ efficiently
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This is not usually regarded as an implementation detail as such, but it
+ can be performed semi-automatically during the implementation process with
+ the aid of a computer algebra system.
+ For example Theano 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "bergstra+al:2010-scipy"
+
+\end_inset
+
+ employs automatic symbolic differentiation to compute gradients, Jacobians
+ and Hessians directly without any manual effort required.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+runtime visualisations and diagnostics in order to identify any high-level
+ performance problems that need to be addressed, and to facilitate efficient
+ human-computer interaction and communication
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In principle, it should be feasible to perform many of these tasks semi-automati
+cally, with the aid of a library of automated implementation and approximation
+ strategies common to a wide variety of inference and decision problems.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In addition to significantly reducing the amount of time and effort the
+ human user needs to spend on comparatively low-level details, allowing
+ much more expressive models to be used without requiring impractical amounts
+ of human effort, this would also provide the opportunity for different
+ approximations to be selected in response to evidence gathered at runtime,
+ analogously to the way in which just-in-time (JIT) compilers perform different
+ optimisations in response to observed runtime behaviour.
+\end_layout
+
+\end_inset
+
+ However, in the absence of such tools,
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+But see 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://probabilistic-programming.org/
+\end_layout
+
+\end_inset
+
+ for examples of recent work in this direction.
+\end_layout
+
+\end_inset
+
+ the translation was performed manually for this project, targeting the
+ Python programming language using the SciPy library 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SciPy"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+These implementation details are non-trivial for GPO in comparison to some
+ competing optimisation methods.
+ This is due to the fact that Bayesian models generally separate the model
+ and implementation specifications.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+However, one should not fall into the trap of thinking that the model and
+ implementation are completely unrelated, as the two are in fact intimately
+ linked --- at the very least, decisions need to be made regarding trade-offs
+ between accuracy and efficiency, which will depend on the model and approximati
+ons combined.
+\end_layout
+
+\end_inset
+
+ Although this does cause some difficulties in tractably implementing models,
+ it is in fact a benefit of the Bayesian formalism.
+ By removing all but the most essential details from the model specification,
+ it is much simpler to invent new models and adapt existing ones.
+ Likewise, by separating out the implementation details, these can be studied
+ separately and generalised across a wide variety of different models.
+ Therefore, although Bayesian models require much more groundwork to be
+ performed in advance, in principle it is possible to institute a much more
+ efficient division of labour, especially in comparison to models that shift
+ some of the implementation complexity into the definition of the abstract
+ model itself.
+\end_layout
+
+\begin_layout Section
+Optimisation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:bbo"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As discussed earlier, any black-box optimiser needs to make assumptions
+ about the structure of the objective function, as well as the performance
+ criteria that it needs to fulfil.
+ Usually it is assumed that the function exhibits some degree of 
+\begin_inset Quotes eld
+\end_inset
+
+smoothness,
+\begin_inset Quotes erd
+\end_inset
+
+ but the precise details of these implicit assumptions are not always obvious
+ in certain optimisers.
+ It is clear that different optimisers do make different assumptions, as
+ they all have an 
+\emph on
+inductive bias
+\emph default
+, performing better on some functions than others.
+\end_layout
+
+\begin_layout Standard
+In principle, it is possible to elucidate these assumptions empirically.
+ Suppose we have a variety of possible assumptions in the form of prior
+ distributions over objective functions, and a range of different utility
+ functions.
+ The expected utility of any particular optimiser under these assumptions
+ can be empirically estimated by a Monte Carlo integral approximation.
+ More specifically, we could sample a number of objective functions from
+ the prior, execute the optimiser on each, and average the utilities correspondi
+ng to each run.
+ The better optimiser performs, the better it must match those assumptions.
+\end_layout
+
+\begin_layout Standard
+For example, in order to evaluate a GPO implementation, we might sample
+ objective functions from our GP prior, and compute the average utility
+ across a number of runs (see Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:gpo-vs-sa"
+
+\end_inset
+
+).
+ How well the implementation performs then indicates how well it approximates
+ the abstract model.
+ This also provides a formal way of comparing a number of different implementati
+ons of the same abstract model, which could be used to automate the implementati
+on process, at least in principle.
+\end_layout
+
+\begin_layout Standard
+Roughly speaking, we can separate black-box optimisation into two main sub-probl
+ems.
+ The first is the amount of effort, in terms of the number of function evaluatio
+ns (FEs), required to extract all of the necessary information from the
+ objective function.
+ For example, if the location of the maximum strongly depends upon a large
+ source of random bits in a non-trivial manner, then this will set a lower
+ bound on the required number of FEs, with the total number needed in practice
+ depending on the accuracy of the prior assumptions.
+\end_layout
+
+\begin_layout Standard
+The second sub-problem, assuming we have obtained enough information to
+ build an accurate model of the function, is the computational difficulty
+ of finding the maximum of this model.
+ This may depend on details such as whether the model provides a convex
+ optimisation problem or not (for example), as well whatever (approximate)
+ methods are being used to optimise it.
+ The degree to which either of these sub-problems matters depends on the
+ relative cost of FEs and computation, as expressed by our (actual) utility
+ function.
+\end_layout
+
+\begin_layout Chapter
+Assumptions, Inference, and Decisions
+\end_layout
+
+\begin_layout Standard
+In this chapter, we briefly discuss the specific assumptions made in the
+ model described in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:pp"
+
+\end_inset
+
+, as well as possible alternatives to these assumptions.
+ In addition, a number of techniques and approximations for inference and
+ decision-making are outlined, which allow us to trade accuracy for computationa
+l efficiency.
+ It is important that each component of the model can be implemented as
+ efficiently as possible (without sacrificing too much accuracy) as any
+ computational savings in one area can be utilised to improve accuracy in
+ another.
+ For example, if we are able to reduce the time required to invert large
+ matrices, we can spend more time on inferring hyper-parameters with greater
+ accuracy.
+\end_layout
+
+\begin_layout Section
+Objective Function Prior
+\end_layout
+
+\begin_layout Standard
+We model the objective function by a GP prior, and make the convenient and
+ conventional assumptions that it has a constant zero 
+\emph on
+mean function
+\emph default
+ 
+\begin_inset Formula $\mu:\mathbb{R}^{D}\to\mathbb{R}$
+\end_inset
+
+ and that the 
+\emph on
+covariance function
+\emph default
+ 
+\begin_inset Formula $\Sigma:\mathbb{R}^{D}\times\mathbb{R}^{D}\to\mathbb{R}$
+\end_inset
+
+ is specified by the squared exponential kernel 
+\begin_inset Formula 
+\[
+K_{\text{SE}}(\mathbf{x},\mathbf{y};\boldsymbol{\theta})=\exp\left(-\frac{1}{2}\sum_{i=1}^{D}\left|\frac{x_{i}-y_{i}}{\theta_{i}}\right|^{2}\right)
+\]
+
+\end_inset
+
+ where the 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ hyper-parameter is a vector of 
+\emph on
+characteristic length-scales
+\emph default
+ for each dimension 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 5.1"
+key "rasmussen2006gaussian"
+
+\end_inset
+
+.
+ If all of the length-scales are constrained to be equal, then the kernel
+ is known as 
+\emph on
+isotropic.
+ 
+\emph default
+It is also common to assume that the kernel is multiplied by a 
+\emph on
+signal variance
+\emph default
+ coefficient 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+, which represents the output scale of the function.
+ However, some brief experiments during this project showed that it is quite
+ easy to overfit this parameter with maximum-likelihood, particularly in
+ the initial phases of the optimisation process when only a few datapoints
+ have been observed, which results in poor overall performance of the optimiser.
+ Therefore, 
+\begin_inset Formula $\theta_{0}=1$
+\end_inset
+
+ was assumed --- more accurate hyper-parameter inference methods (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:hyper-inf"
+
+\end_inset
+
+) would be required in order to be able to relax this assumption.
+\end_layout
+
+\begin_layout Standard
+More sophisticated assumptions than this are of course possible.
+ For example, instead of fixing the mean, it could be given a vague prior
+ and inferred from the data 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MudgeThesis"
+
+\end_inset
+
+.
+ It is also possible to consider a variety of different kernels.
+ For example, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+ claim that the Matérn kernel performs better on common black-box function
+ benchmark problems, although it was not found to make a significant difference
+ in this project (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:res"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+One can also superimpose different kernels, for example two kernels of differing
+ length-scales 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "RobinsonThesis"
+
+\end_inset
+
+, in order to model a combination of low- and high-frequency components
+ in the objective function.
+ It is also possible to use an 
+\emph on
+additive kernel
+\emph default
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "AddGP2011"
+
+\end_inset
+
+ in order to model the objective function as a sum of low-dimensional components.
+ Furthermore, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Duvenaud2013"
+
+\end_inset
+
+ describe a framework for combining an arbitrary number of base kernels
+ to model richly structured functions, and present an approximate greedy
+ algorithm for searching over the space of composite kernels.
+ It should be possible to utilise this framework within a fully Bayesian
+ (hierarchical) model, which could allow more accurate approximate inference
+ procedures.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+The main practical issue that needs to be solved for such a model is in
+ determing the promising regions of the composite kernel space that are
+ deserving of the computational resources required to investigate them.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hyper-parameters
+\end_layout
+
+\begin_layout Standard
+For simplicity, the 
+\emph on
+hyper-prior
+\emph default
+ on 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ was chosen to be the improper uniform distribution over the region 
+\begin_inset Formula $\boldsymbol{\theta}\in(0,+\infty)^{D}$
+\end_inset
+
+.
+ In some sense, this is the least informative prior possible, and means
+ that we assume all of the information about the hyper-parameters will be
+ provided by the likelihood of the data.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Although, since this is a scale parameter, a Jeffreys prior or similar may
+ have been more appropriate.
+\end_layout
+
+\end_inset
+
+ When a large amount of data is available, it is often reasonable to assume
+ that the likelihood will be strongly peaked around a single value, and
+ hence the specific choice of any (sufficiently vague) prior will have comparati
+vely little impact on the hyper-parameter posterior distribution.
+ Another consequence of this assumption is that we can estimate a single
+ likely value of 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ without losing too much information.
+ This can be done by either selecting the maximiser of the likelihood function
+ (maximum likelihood inference) or of the posterior (so-called maximum 
+\emph on
+a posteriori
+\emph default
+ inference).
+\end_layout
+
+\begin_layout Standard
+However, when only a small amount of data has been observed --- in the case
+ of GPO, when only a small number of function evaluations have been performed
+ so far --- this assumption is likely to be invalid.
+ Therefore, a somewhat informative prior is desirable, such as the log-normal
+ prior used by 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "FreanBoyle2008"
+
+\end_inset
+
+.
+ In addition, estimating 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ by a single value becomes a poor approximation, so a more accurate marginalisat
+ion of the hyper-parameters, such as a Monte Carlo integral approximation,
+ should be used.
+ This issue is discussed further in 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:hyper-inf"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Other Alternatives
+\end_layout
+
+\begin_layout Standard
+The computational cost of dealing with high dimensions can be ameliorated
+ slightly by imposing additional constraints on the assumed structure of
+ the objective function.
+ For example, if one assumes that not all of the dimensions are equally
+ informative, it would not be unreasonable to transform the function into
+ a lower-dimensional space prior to performing the necessary inference and
+ optimisation tasks 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "REMBO,Djolonga2013,Garnett2013"
+
+\end_inset
+
+.
+ However, although this may work for some applications, it is quite a strong
+ assumption for general black-box functions, and so was not considered for
+ this project.
+ It is also not entirely clear how one should select the dimensionality
+ of the lower-dimensional space without specific prior knowledge, although
+ in principle a hierarchical model should be able to infer this, perhaps
+ in a similar manner to how the number of components in a clustering problem
+ can be automatically determined with the aid of a Dirichlet process model.
+\end_layout
+
+\begin_layout Standard
+Another possibility is to allow the objective function to have a more heterogene
+ous structure than allowed by individual GPs with stationary kernels.
+ For example, we may assume that the function behaves differently in different
+ regions of the space, and allow the model enough flexibility to infer these
+ regions from the data.
+ Each region can then be modelled by a GP with a different kernel and/or
+ hyper-parameters.
+ In the one-dimensional case, this is known as 
+\emph on
+changepoint detection
+\emph default
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Adams2007,Garnett2009"
+
+\end_inset
+
+.
+ Although these techniques are limited to a single dimension, in principle
+ it should be possible to generalise them to higher dimensions, by considering
+ hyperplanes separating the regions rather than single points.
+\end_layout
+
+\begin_layout Standard
+And finally, for some applications a GP may simply be incapable of accurately
+ modelling the structure of the objective function.
+ In such cases, an entirely different prior distribution over the space
+ of functions may be required 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "REMBO"
+
+\end_inset
+
+, but this is beyond the scope of this report.
+\end_layout
+
+\begin_layout Section
+Gaussian Conditionals
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:gauss-cond"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By definition, any finite collection of points from a Gaussian process follows
+ a (high-dimensional) multi
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+-
+\end_layout
+
+\end_inset
+
+variate Gaussian distribution,
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Conversely, one could consider a multivariate Gaussian to simply be a GP
+ defined on a finite set of points.
+\end_layout
+
+\end_inset
+
+ and so inference techniques for the latter apply to the former also.
+ In particular, the predictive distribution of a GP given a set of observations
+ is simply a conditional Gaussian distribution.
+ Suppose we have sampled at points 
+\begin_inset Formula $X$
+\end_inset
+
+ with corresponding observations 
+\begin_inset Formula $Y_{X}=f(X)$
+\end_inset
+
+, and wish to compute the 
+\emph on
+predictive distribution
+\emph default
+ of 
+\begin_inset Formula $Y_{T}=f(T)$
+\end_inset
+
+ at a set of test points 
+\begin_inset Formula $T$
+\end_inset
+
+.
+ Clearly the joint distribution 
+\begin_inset Formula 
+\[
+\begin{bmatrix}Y_{X}\\
+Y_{T}
+\end{bmatrix}\sim\mathcal{N}\left(\begin{bmatrix}\mu_{X}\\
+\mu_{T}
+\end{bmatrix},\begin{bmatrix}\Sigma_{XX} & \Sigma_{XT}\\
+\Sigma_{TX} & \Sigma_{TT}
+\end{bmatrix}\right)
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $\mu_{X}=\mu(X)$
+\end_inset
+
+ gives the (column) vector of means of 
+\begin_inset Formula $Y_{X}$
+\end_inset
+
+ for each point in 
+\begin_inset Formula $X$
+\end_inset
+
+, 
+\begin_inset Formula $\Sigma_{XT}=\Sigma(X,T)$
+\end_inset
+
+ gives the matrix of covariances with rows corresponding to 
+\begin_inset Formula $X$
+\end_inset
+
+ and columns to 
+\begin_inset Formula $T$
+\end_inset
+
+, and likewise for the others.
+ We can then apply the appropriate identity 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 8.1.3"
+key "Petersen2012"
+
+\end_inset
+
+ to obtain the conditional (predictive) distribution 
+\begin_inset Formula 
+\begin{alignat}{1}
+Y_{T}|Y_{X},T,X\sim\mathcal{N}\bigg(\qquad\mu_{T}+\Sigma_{TX}\Sigma_{X}^{-1} & (Y_{X}-\mu_{X}),\nonumber \\
+\Sigma_{TT}-\Sigma_{TX}\Sigma_{X}^{-1} & \Sigma_{XT}\qquad\qquad\bigg)\label{eq:gauss_cond}
+\end{alignat}
+
+\end_inset
+
+ where 
+\begin_inset Formula $\Sigma_{X}^{-1}=(\Sigma_{XX})^{-1}$
+\end_inset
+
+ is the inverse covariance, or 
+\emph on
+precision
+\emph default
+, matrix of 
+\begin_inset Formula $Y_{X}$
+\end_inset
+
+.
+ The precision matrix is closely related to the partial correlation matrix,
+ which can be obtained by a suitable rescaling of the entries.
+ Roughly speaking, the partial correlation between pairs of variables in
+ 
+\begin_inset Formula $Y_{X}$
+\end_inset
+
+ indicates how strongly they are correlated when conditioned on the remaining
+ variables in 
+\begin_inset Formula $Y_{X}$
+\end_inset
+
+, and reduces to zero when the pair is conditionally independent given the
+ others.
+ To put it another way, if we assume we have already observed all but two
+ points 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $x^{\prime}$
+\end_inset
+
+, the corresponding entry in 
+\begin_inset Formula $\Sigma_{X}^{-1}$
+\end_inset
+
+ tells us how much information observing 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ will give us about 
+\begin_inset Formula $f(x^{\prime})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If we assume that the observations of function outputs are corrupted by
+ independent Gaussian noise (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:noise"
+
+\end_inset
+
+) with standard deviation 
+\begin_inset Formula $\sigma_{\text{noise}}$
+\end_inset
+
+, very little change is required.
+ We simply need to increment each entry on the diagonal of 
+\begin_inset Formula $\Sigma_{XX}$
+\end_inset
+
+ by 
+\begin_inset Formula $\sigma_{\text{noise}}^{2}$
+\end_inset
+
+, prior to inverting it.
+\end_layout
+
+\begin_layout Subsection
+Computation
+\end_layout
+
+\begin_layout Standard
+We now turn to the problem of actually computing the inverses and matrix
+ products in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gauss_cond"
+
+\end_inset
+
+.
+ Standard computational techniques will not be discussed, as these are usually
+ built into most general-purpose linear algebra libraries.
+ However, the covariance matrices we are utilising have greater structure
+ than arbitrary matrices, and we can exploit this for computational gain.
+\end_layout
+
+\begin_layout Standard
+This is quite an important implementation detail, as the fact that these
+ matrix operations need to be performed after each observation means that
+ computational efficiency can degrade quite quickly as the number of function
+ evaluations increases.
+ A naive implementation of GPO can easily have 
+\begin_inset Formula $\mathcal{O}(N^{4})$
+\end_inset
+
+ time complexity, making it intractable to be able to handle more than a
+ few hundred or thousand function evaluations, depending on available resources.
+ This causes difficulties for GPO to be able to efficiently scale to high
+ dimensions, as higher-dimensional problems tend to require a greater number
+ of function evaluations to be able to achieve similar levels of accuracy.
+\end_layout
+
+\begin_layout Standard
+Unfortunately, most of the following computational techniques were not implement
+ed for this project due to time constraints, but it is vital that such approxima
+tions be considered in the future if GPO is to be implemented in a scalable
+ way.
+ To put the problem in context, we have available to us multiple implementations
+ of the abstract 
+\emph on
+matrix (pseudo-)inverse
+\emph default
+ function, each with different performance characteristics.
+ We need to select the implementation most appropriate for this application
+ which, as discussed earlier, could be formalised by introducing appropriate
+ penalties into the utility function.
+\end_layout
+
+\begin_layout Standard
+Intuitively, the factor 
+\begin_inset Formula $\Sigma_{TX}\Sigma_{X}^{-1}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gauss_cond"
+
+\end_inset
+
+ tells us that in order to determine the predictive distribution at some
+ point 
+\begin_inset Formula $t$
+\end_inset
+
+, we need to consider all neighbouring points 
+\begin_inset Formula $x$
+\end_inset
+
+ in the dataset with non-negligible covariance 
+\begin_inset Formula $\Sigma(t,x)$
+\end_inset
+
+, and all points 
+\begin_inset Formula $z$
+\end_inset
+
+ conditionally correlated with 
+\begin_inset Formula $x$
+\end_inset
+
+ such that 
+\begin_inset Formula $\Sigma_{X}^{-1}(x,z)$
+\end_inset
+
+ is also non-negligible.
+ It is possible to exploit this fact, as we would rather spend most of our
+ computational resources on highly informative pairs 
+\begin_inset Formula $\{x,z\}\subset X$
+\end_inset
+
+, as they will have the most influence on the predictive distribution.
+\end_layout
+
+\begin_layout Standard
+A simple way of doing this is to simply zero out all matrix entries smaller
+ (in magnitude) than some threshold, so that we are only required to multiply
+ sparse matrices.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This approximation is not significantly different to the numerical rounding
+ errors encountered when using floating-point arithmetic, except for in
+ magnitude.
+ The error threshold could either be fixed in advance, or automatically
+ adapted somehow in order to optimally balance accuracy against efficiency.
+\end_layout
+
+\end_inset
+
+ This can be accomplished by explicitly truncating the kernel function,
+ and enforcing sparsity constraints on the precision matrix 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GraphLasso2007"
+
+\end_inset
+
+.
+ Assuming the sparse matrix has many fewer non-zero entries than the original,
+ this can result in significant improvements in computational efficiency.
+ It is also possible to re-interpret these sparse matrices as the adjacency
+ matrix of a weighted (undirected) graph over the dataset, producing the
+ network generated by pairs of highly correlated points.
+ From the geostatistics literature, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GMRF2011"
+
+\end_inset
+
+ utilise this idea to translate GP models into 
+\emph on
+Gaussian Markov random fields
+\emph default
+ (GMRFs),
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Thanks to Thomas Taimre for directing me to this paper.
+\end_layout
+
+\end_inset
+
+ which allow greater computational performance due to increased localisation.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SGCRF2013"
+
+\end_inset
+
+ discusses some further applications in the context of machine learning.
+\end_layout
+
+\begin_layout Standard
+In some situations, simply ignoring small correlations may be too crude
+ an approximation.
+ However, as before, we would still like to spend computational effort proportio
+nally to the amount of information we gain by doing so.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GPkepler2014"
+
+\end_inset
+
+ draw an analogy to the 
+\begin_inset Formula $n$
+\end_inset
+
+-body problem, in which one is required to simulate the gravitational interactio
+n between a number of physical bodies (or 
+\emph on
+particles
+\emph default
+).
+ The similarity is that, for the kernels being considered here, covariance
+ decays with increased distance in a similar manner to gravitational attraction.
+ A common approximation in this problem is to consolidate groups of distant
+ particles into a single point, with the aid of a recursive partitioning
+ of the space.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GPkepler2014"
+
+\end_inset
+
+ suggest a similar but slightly different approach, in which blocks of the
+ covariance matrix corresponding to groups of points with low mutual correlation
+s are approximated as low-rank matrices.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Thanks to Marcus Frean for directing me to this paper.
+\end_layout
+
+\end_inset
+
+ Once this decomposition has been computed, the inverse and determinant
+ of the matrix can be obtained with comparatively little effort.
+ However, the authors note that this method suffers a constant-factor increase
+ in runtime as dimensionality increases.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+It is possible that this is due to the fact that is more difficult to order
+ high-dimensional points in order to concentrate covariances along the diagonal
+ of the matrix, as required by the decomposition method.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Another potential source of efficiency gains occurs when an observation
+ 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ is highly predictable given the other data.
+ In this case, the presence (or absence) of this datapoint has little impact
+ on the posterior distribution.
+ For example, if we have a cluster of points along a small interval with
+ similar function values, throwing away a subset of these points is unlikely
+ to make a substantial impact on the quality of our inferences.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 8"
+key "rasmussen2006gaussian"
+
+\end_inset
+
+ extend this idea by removing all but a subset of points, known as the 
+\emph on
+active set
+\emph default
+, from the inference process.
+ They also describe a number of approximate techniques for doing so, with
+ the intent of retaining only the most informative observations.
+ However, computing the active set can be an expensive process in itself,
+ so this method is only applicable if the dataset is large enough to offset
+ this cost by the subsequent performance gains.
+ It also has the issue of completely ignoring potentially useful information,
+ which may be undesirable for some problems.
+\end_layout
+
+\begin_layout Standard
+It is also possible to exploit the fact that the size of the dataset gradually
+ increases with each iteration.
+ For example the 
+\emph on
+matrix inversion lemma
+\emph default
+ can be used to incrementally update the inverse as the covariance matrix
+ is modified 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S A.3"
+key "rasmussen2006gaussian"
+
+\end_inset
+
+.
+ Similarly, methods for incrementally updating singular value decompositions
+ are also available 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "updateSVD1978"
+
+\end_inset
+
+, which can then be used to compute the matrix pseudo-inverses used in the
+ following section.
+\end_layout
+
+\begin_layout Subsection
+Numerical Stability
+\end_layout
+
+\begin_layout Standard
+In addition to concerns of speed, we need to be mindful of the accuracy
+ (or 
+\emph on
+stability
+\emph default
+) of our numerical approximations.
+ In particular, problems can arise when we are dealing with clusters of
+ nearby points, as the corresponding rows/columns in the covariance matrix
+ will be almost identical 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 6.4"
+key "Osborne2010"
+
+\end_inset
+
+, making inversion difficult due to ill-conditioning.
+ According to 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "p22"
+key "MackayGP1998"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Quote
+The dot product [of 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\Sigma_{TX}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Sigma_{X}^{-1}Y_{X}$
+\end_inset
+
+]
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ may turn out to be the sum of very large positive and negative values although
+ its magnitude may be small.
+ This may lead to inaccuracies in the evaluation of the [predictive distribution
+] when the model is implemented on a computer.
+ The problem is caused by an ill conditioned covariance matrix, for example,
+ when the model assumes a small noise level.
+ To reduce such numerical errors, we can use the 
+\begin_inset Formula $LU$
+\end_inset
+
+ decomposition of [the covariance matrix] or eigenvector/eigenvalue decompositio
+ns.
+ Another way to deal with ill-conditioning is to split [the covariance matrix]
+ into several pieces and make use of the [matrix inversion lemma].
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ill-cond"
+
+\end_inset
+
+ illustrates the problems this ill-conditioning can cause (the format is
+ the same as the plots in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "app:code"
+
+\end_inset
+
+).
+ On the left, a number of samples from the objective function have been
+ taken, including the point 
+\begin_inset Formula $f(2.1)\approx.6$
+\end_inset
+
+.
+ The plot on the right shows the extreme change to the predictive distribution
+ after observing 
+\begin_inset Formula $f(1.9)\approx.635$
+\end_inset
+
+.
+ Note that the 
+\begin_inset Formula $y$
+\end_inset
+
+-axis has increased by almost an order of magnitude.
+ Clearly this observation should not have caused such a drastic change to
+ the posterior distribution.
+\end_layout
+
+\begin_layout Standard
+The problem is that, although values of the objective function are observed
+ without any noise explicitly added (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:noise"
+
+\end_inset
+
+), there is still a small amount of 
+\emph on
+numerical noise
+\emph default
+ being added by the computational approximations and rounding errors.
+ This must be taken into account.
+ Otherwise, in regions near previous samples the predictive variance will
+ be very low, and so even a small numerical error in the observation will
+ push it outside of the high-density region of the predictive distribution,
+ causing a large change to the posterior.
+ This is a case of unpredictable observations shifting beliefs much more
+ than predictable ones.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename badpt1.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename badpt2.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Sudden change to posterior caused by ill-conditioning
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ill-cond"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A particularly simple solution to this problem is to allow the model to
+ assume a small amount of observation noise.
+ Independent Gaussian noise with standard deviation 
+\begin_inset Formula $\sigma_{\text{noise}}=10^{-3}$
+\end_inset
+
+ was found to work quite well in this project, although ideally the magnitude
+ of noise should be set taking into account problem-specific factors as
+ well as other numerical approximations being used in the implementation.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In particular, this noise should not be too small as doing so has little
+ difference to assuming zero noise, nor should it be significantly larger
+ than the amount of numerical error actually present, as this will cause
+ other problems with accuracy due to the model underfitting the data.
+\end_layout
+
+\end_inset
+
+ This allows the model to cope with small numerical errors, even if the
+ observations would ideally have zero noise in an exact implementation.
+ It also ensures that no two rows or columns in the covariance matrix are
+ almost-identical, due to the additional noise term added to the diagonal
+ (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:gauss-cond"
+
+\end_inset
+
+).
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Osborne2010"
+
+\end_inset
+
+ suggests instead taking finite differences between nearby observations
+ and using them to approximate derivative observations.
+ However, this seems like a much more complicated solution without any clear
+ benefit.
+\end_layout
+
+\end_inset
+
+ One might also draw parallels between this and regularisation techniques
+ like ridge regression.
+\end_layout
+
+\begin_layout Standard
+Another way of preventing numerical instability is to avoid explicitly computing
+ the matrix inverse in favour of other techniques.
+ One way of doing this is noting that we can replace the matrix inverses
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gauss_cond"
+
+\end_inset
+
+ with (Moore-Penrose) 
+\emph on
+pseudo-inverses
+\emph default
+, which can be computed by many linear algebra libraries.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+As the matrices were are dealing with are technically invertible, the pseudo-inv
+erse is still equal to the actual inverse in theory, but tends to be more
+ robust to numerical errors.
+\end_layout
+
+\end_inset
+
+ Unfortunately, although the asymptotic computational complexity of doing
+ so is no greater than computing the actual inverse, in practice there is
+ a constant-factor increase in computational expense.
+ This factor depends on the method being used to calculate the pseudo-inverse,
+ of which some libraries provide several alternatives.
+ In particular, when we are dealing with square matrices, methods based
+ on the 
+\emph on
+singular value decomposition
+\emph default
+ (SVD) are known to be faster, and possibly more numerically stable, than
+ those taking a least-squares approach.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+For example, a simple experiment showed that the time required to pseudo-invert
+ a random 
+\begin_inset Formula $1000\times1000$
+\end_inset
+
+ matrix can differ by an order of magnitude between the two methods.
+ Using the SciPy library, one should therefore use the SVD-based 
+\family typewriter
+pinv2
+\family default
+ function for square matrices rather than the standard 
+\family typewriter
+pinv
+\family default
+ function.
+ When the matrix is symmetric, the 
+\family typewriter
+pinvh
+\family default
+ function can be used to halve the computational expense, requiring just
+ over four times as long as computing the matrix inverse.
+ Further details at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://vene.ro/blog/inverses-pseudoinverses-numerical-issues-speed-symmetry.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An interesting side-effect of computing the pseudo-inverse is that one can
+ determine the 
+\emph on
+effective rank
+\emph default
+ of the covariance matrix, simply by counting the number of non-negligible
+ singular values.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Such as those with magnitude of at least 1% that of the largest singular
+ value, for example.
+\end_layout
+
+\end_inset
+
+ Unfortunately this does not directly lead to any significant computational
+ gains, due to the expense of actually computing the SVD in the first place,
+ but it does give an indication of how 
+\begin_inset Quotes eld
+\end_inset
+
+difficult
+\begin_inset Quotes erd
+\end_inset
+
+ the inversion problem is.
+ That is, it should be possible to invert matrices with low effective rank
+ more easily than those with high rank without a significant reduction in
+ accuracy, due to the fact that such matrices can be effectively 
+\begin_inset Quotes eld
+\end_inset
+
+compressed
+\begin_inset Quotes erd
+\end_inset
+
+ to low-rank matrices 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "KalmanSVD2002"
+
+\end_inset
+
+.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+One might draw an analogy to other SVD-based dimensionality reduction techniques
+, such as 
+\emph on
+principal components analysis
+\emph default
+ (PCA) and 
+\emph on
+latent semantic analysis
+\emph default
+ (LSA).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the case of a GP with a squared exponential kernel, informal experimentation
+ suggests that the effective rank of the covariance matrix is the same as
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+effective
+\begin_inset Quotes erd
+\end_inset
+
+ size of the dataset, by which we mean the size after all points closer
+ than a length-scale apart have been removed.
+ This may provide some guidance for selecting the size of the 
+\begin_inset Quotes eld
+\end_inset
+
+active set
+\begin_inset Quotes erd
+\end_inset
+
+ in the approximations outlined earlier, since they can be interpreted as
+ a case of reduced-rank approximation 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 8.1"
+key "rasmussen2006gaussian"
+
+\end_inset
+
+.
+ However, as this low-rank compression 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "KalmanSVD2002"
+
+\end_inset
+
+ does not simply remove rows/columns from the matrix, but rather creates
+ linear combinations over a small set of basis vectors, it may be possible
+ to achieve better performance by 
+\emph on
+combining
+\emph default
+ datapoints in a similar manner, rather than completely ignoring some of
+ them.
+\end_layout
+
+\begin_layout Section
+Hyper-parameter Inference
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:hyper-inf"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order to infer the infer the kernel hyper-parameters 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+, we need to compute their posterior distribution conditioned on the observation
+s, which is the product of the hyper-prior and the likelihood of the observed
+ data.
+ A convenient transformation of the likelihood is the negative logarithm,
+ and is the same as that of a multivariate Gaussian 
+\begin_inset Formula 
+\begin{equation}
+-\mathcal{L}(\boldsymbol{\theta};X,Y)=-\log p(Y|X,\boldsymbol{\theta})\propto Y^{\top}\Sigma_{X}^{-1}Y+\log|\Sigma_{X}|+\text{const.}\label{eq:nll}
+\end{equation}
+
+\end_inset
+
+ As discussed earlier, if we assume that this function has a single strong
+ peak, and the hyper-prior is quite flat and uninformative, then it is reasonabl
+e to approximate the relevant marginalisations with a single point estimate
+ 
+\begin_inset Formula $\hat{\boldsymbol{\theta}}$
+\end_inset
+
+ using 
+\emph on
+maximum likelihood
+\emph default
+ (ML), by minimising 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:nll"
+
+\end_inset
+
+.
+ Alternatively, when we have a suitably informative prior, it is better
+ to maximise the posterior instead --- so-called 
+\emph on
+maximum a posteriori
+\emph default
+ (MAP) inference --- as it may differ significantly from the likelihood.
+\end_layout
+
+\begin_layout Standard
+However, as the results presented in the following chapter show (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:cvg"
+
+\end_inset
+
+), the single-strong-peak assumption required for ML or MAP inference to
+ be accurate is not necessarily justified in the case of GPO.
+ These approximate inference methods can also cause problems by overfitting
+ the hyper-parameters 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013,REMBO"
+
+\end_inset
+
+ --- particularly in the initial stages of the optimisation when little
+ data has been observed --- as well as issues with hyper-parameter estimates
+ jumping suddenly between iterations 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "RobinsonThesis"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In order to avoid these problems, a more accurate approximation to marginalising
+ out the hyper-parameters is necessary.
+ For example, we can utilise Monte Carlo samples from the hyper-posterior
+ in order to approximate integrals by sample averages.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PBOML2012"
+
+\end_inset
+
+ discuss how this can be performed in order to marginalise expected improvement
+ (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:utility"
+
+\end_inset
+
+), and demonstrate that this achieves better performance in practice than
+ taking single point estimates with a method such as maximum-likelihood.
+\end_layout
+
+\begin_layout Standard
+However, these improvements in accuracy do come at the expense of added
+ implementation complexity.
+ Therefore, for this project, 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ was simply estimated using maximum-likelihood, minimising 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:nll"
+
+\end_inset
+
+ by conjugate gradient, randomly restarting twenty times by sampling from
+ a standard log-normal distribution.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This was simply a convenient distribution to use since we are favouring
+ simplicity over accuracy.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Utility
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:utility"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+utility function
+\emph default
+ 
+\begin_inset Formula $U=f(x^{*})$
+\end_inset
+
+, where 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ is the maximiser reported by GPO, was chosen both for its simplicity, as
+ well as compatibility with the commonly-used 
+\emph on
+expected improvement
+\emph default
+ (EI) criteria 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ei"
+
+\end_inset
+
+.
+ However, it should be noted that this utility function encourages a specific
+ type of behaviour from the optimiser.
+ In particular, since we are considering the 
+\emph on
+value
+\emph default
+ of the maximum, the optimiser will prefer situations in which there is
+ a small chance of a very large maximum (and possibly a high chance of a
+ poor one) to those in which there will be a moderate maximum with near
+ certainty, for example.
+ The extent to which this will impact on actual performance depends on the
+ particular application.
+ If such behaviour is undesirable, a different utility function should be
+ considered that more accurately reflects the priorities of the problem.
+\end_layout
+
+\begin_layout Standard
+As discussed earlier, ideally one should also take into account the costs
+ of (computational) resources consumed by the optimiser.
+ For example, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "nonmyopicSGO1999,PBOML2012"
+
+\end_inset
+
+ explicitly consider the costs of performing function evaluations, so that
+ the optimiser can avoid taking samples that would provide little information
+ relative to the expense of doing so.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 2.3.2"
+key "BOtut2010"
+
+\end_inset
+
+ suggest discounting EI by an exploration/exploitation parameter 
+\begin_inset Formula $\xi$
+\end_inset
+
+, to make the optimiser ignore samples that are likely to produce only small
+ improvements to the maximum, which could be considered an approximation
+ to this idea.
+ However, these concerns were beyond the scope of this project.
+\end_layout
+
+\begin_layout Subsection
+Justification
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:utility-just"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the preceding discussion we have implicitly assumed that maximising expected
+ utility (MEU) is a sensible thing to do, although this is not necessarily
+ a foregone conclusion.
+ Theoretically, it can be justified somewhat by the von-Neumann-Morgenstern
+ axioms 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "VNM"
+
+\end_inset
+
+, or the Bayesian analogue due to Savage 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Savage"
+
+\end_inset
+
+,
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+See 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://lesswrong.com/lw/5te
+\end_layout
+
+\end_inset
+
+ for a summary of the axioms.
+\end_layout
+
+\end_inset
+
+ in a similar way to how Bayesian inference can be justified by Cox's axioms
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "paris2006uncertain"
+
+\end_inset
+
+.
+ It is also one of the few commonly-used frameworks that allows us to make
+ decisions in a principled manner within a Bayesian context, without having
+ to resort to 
+\emph on
+ad hoc
+\emph default
+ decision rules.
+ However, it does have some potential pitfalls, so appropriate care needs
+ to be exercised in order to avoid them.
+\end_layout
+
+\begin_layout Standard
+The classic illustration of some of these issues is the St.
+\begin_inset space \space{}
+\end_inset
+
+Petersburg paradox.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Expected utility was in fact originally proposed as a solution to this paradox,
+ but it is generally possible to modify it to display the same problems
+ for any unbounded utility, simply by redistributing probability mass in
+ order to make the payout have non-finite expectation.
+\end_layout
+
+\end_inset
+
+ Suppose we play a game in which you only win a small amount most of the
+ time, but always have a small chance of winning an arbitrarily large amount,
+ such that the expected payout of any given game is infinite.
+ Blindly maximising expected utility would cause us to bet arbitrarily large
+ amounts of money on this game, as the expected utility of playing would
+ always be greater than that of not playing.
+\end_layout
+
+\begin_layout Standard
+The most obvious problem is that unbounded utilities simply don't make sense
+ in a finite world --- any utility function for a practical problem is inherentl
+y bounded, and assuming otherwise can lead to undesirable behaviour.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In fact, depending on the axioms one subscribes to, utilities may be bounded
+ by definition.
+\end_layout
+
+\end_inset
+
+ The utility 
+\begin_inset Formula $U$
+\end_inset
+
+ defined earlier for the GPO model is in fact unbounded, but in practice
+ it will be limited by the precision of the machine, so we could easily
+ bound it at a suitably large value (
+\begin_inset Formula $10^{100}$
+\end_inset
+
+ say) without causing too much of a difference.
+ Unbounded utilities are simply a mathematical convenience.
+ One might draw an analogy to the use of improper priors which, although
+ being quite convenient, make little sense when taken literally and can
+ cause difficulties in some situations.
+ What we are really doing is taking the limit of an appropriate sequence
+ of proper priors (or bounded utilities), and problems occur precisely when
+ this limit is nonsensical.
+\end_layout
+
+\begin_layout Standard
+However, suppose for a moment that we were to allow unbounded utilities,
+ to force us to look at other potential issues.
+ As the expectation is non-finite, it clearly doesn't make sense to conceptualis
+e the average payout over a large number of trials, as the law of large
+ numbers simply doesn't apply.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In the same way that averaging samples from a Cauchy distribution never
+ converges to a single point, no matter how samples are taken.
+ See 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Alexander2010"
+
+\end_inset
+
+ for a colourful discussion of a similar betting game that utilises the
+ Cauchy distribution.
+\end_layout
+
+\end_inset
+
+ Therefore, we need to consider how many games we intend to actually play.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:stp"
+
+\end_inset
+
+ shows a number of simulations of the average payout trajectory.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Also see 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.science20.com/print/96549
+\end_layout
+
+\end_inset
+
+ for an (informal) discussion of this idea.
+\end_layout
+
+\end_inset
+
+ It can be seen that, other than the occasional large win, the 
+\begin_inset Quotes eld
+\end_inset
+
+typical
+\begin_inset Quotes erd
+\end_inset
+
+ average payout tends to gradually increase with the number of trials.
+ Therefore, we might be inclined to bet a greater amount if we intended
+ to play a larger number of trials, as we'd be more likely to win it back
+ than if we played only a few.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename stp.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+100 independent simulations of 
+\begin_inset Formula $10^{5}$
+\end_inset
+
+ St.
+\begin_inset space \space{}
+\end_inset
+
+Petersburg games played in sequence
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:stp"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This example illustrates the fact that decisions cannot always be made in
+ isolation, the context in which they are made also need to considered.
+ In the case of GPO, one should ideally consider how it is going to be used.
+ If we are only going to optimise a single important function and then throw
+ away the program, then more conservative behaviour may be desirable, in
+ order to have the best chance of a favourable outcome.
+ On the other hand, if it is to be run on a large number of functions over
+ its lifetime, we may want it to take more risks that may result in worse
+ results in a number of isolated cases but better results overall.
+\end_layout
+
+\begin_layout Standard
+Another piece of context that needs to be taken into account is the 
+\begin_inset Quotes eld
+\end_inset
+
+initial capital
+\begin_inset Quotes erd
+\end_inset
+
+ of the agent.
+ In the game above, if we bet a significant chunk of our wealth on each
+ trial, then there is a greater chance that we will go bankrupt before being
+ able to win it back (the so-called 
+\emph on
+gambler's dilemma
+\emph default
+).
+ In other words, we need to make sure that long-term gains aren't overshadowed
+ by short-term losses.
+ In the case of our optimiser, suppose we have no idea whether it performs
+ well, and are trying to quickly evaluate it.
+ If it performs poorly throughout our limited testing, we are likely to
+ terminate it and focus on another solution, so the optimiser would be wise
+ to behave more conservatively in order provide a better first impression.
+ On the other hand, if we are willing to give the agent a much longer time
+ in order to prove itself, it would not be unreasonable to risk more losses
+ for greater overall gains.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Of course, it is not completely incorrect to treat individual problems independe
+ntly from their context.
+ Doing so may be a sufficient approximation for the application, in the
+ same way the 
+\emph on
+naive Bayes
+\emph default
+ independence assumption is sufficient for a number of problems.
+ However, it may be helpful to reconsider this if the types of issues outlined
+ above are likely to be an issue.
+\end_layout
+
+\begin_layout Standard
+It is also possible to reduce the disparity between inference and decision-makin
+g.
+ Suppose we are dealing with bounded utilities (as argued above), and furthermor
+e that they take values in the range 
+\begin_inset Formula $[0,1]$
+\end_inset
+
+.
+ This is not difficult to do, since utilities are equivalent under (positive)
+ affine transformations, by the linearity of expectation.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+The maximiser of 
+\begin_inset Formula $\E U$
+\end_inset
+
+ is unchanged (assuming 
+\begin_inset Formula $a>0$
+\end_inset
+
+): 
+\begin_inset Formula $\max\E(aU+b)=\max(a\cdot\E U+b)=a\cdot\max(\E U)+b$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ It is then possible to re-interpret utilities as (conditional) probabilities.
+ Specifically, the utility 
+\begin_inset Formula $U(\omega)$
+\end_inset
+
+ of some world-state 
+\begin_inset Formula $\omega$
+\end_inset
+
+ can be identified with the probability of some notion of 
+\begin_inset Quotes eld
+\end_inset
+
+ultimate success
+\begin_inset Quotes erd
+\end_inset
+
+ conditioned on the state 
+\begin_inset Formula $\omega$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PlanInfer2006"
+
+\end_inset
+
+.
+ MEU is then equivalent to simply maximising the (marginalised) probability
+ of success.
+ Or, to put it another way, if we put a uniform prior over the set of actions,
+ we're selecting the most likely actions conditioned on success 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Goodman2008"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There are several useful repercussions to this.
+ The first is that common decision-making approximations can be analysed
+ in a familiar probabilistic setting.
+ For example, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PlanInfer2006"
+
+\end_inset
+
+ show how time-discounted rewards can be re-interpreted as a prior over
+ the lifetime of the agent.
+ Not only does this give a clearer insight into the problem, which may be
+ a helpful mental aid for constructing and analysing utility-based models,
+ but it also allows techniques to be shared across the two problems.
+ As an example of this, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PlanInfer2006"
+
+\end_inset
+
+ show that the 
+\emph on
+expectation-maximisation
+\emph default
+ (EM) algorithm, commonly used for performing inference by maximum-likelihood,
+ can be re-targeted as a technique for making decisions by maximising expected
+ utility.
+\end_layout
+
+\begin_layout Standard
+This interpretation may also highlight the connection between Monte Carlo
+ inference techniques and stochastic optimisation procedures.
+ For instance, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "JMLR:v15:wierstra14a"
+
+\end_inset
+
+ describes the link between state-of-the-art global optimisers such as CMA-ES
+ and 
+\emph on
+natural gradients
+\emph default
+, which can in turn be linked to 
+\emph on
+variational methods
+\emph default
+ for Bayesian inference 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Honkela2007"
+
+\end_inset
+
+.
+ Although this correspondence is somewhat superficial, it would be interesting
+ to investigate whether the connection runs deeper --- for example, whether
+ it is possible to re-interpret optimisers such as CMA-ES as performing
+ approximate (variational) Bayesian inference.
+\end_layout
+
+\begin_layout Standard
+These concerns were beyond the scope of this project, but they may be interestin
+g directions to investigate in the future.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Maximising Expected Utility
+\end_layout
+
+\begin_layout Standard
+In this section we derive the optimal decision policy for selecting the
+ actions 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ (
+\begin_inset Formula $t\leq N$
+\end_inset
+
+) and 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ so as to maximise the expected utility 
+\begin_inset Formula $U=f(x^{*})$
+\end_inset
+
+.
+ Unsurprisingly, this optimal solution is generally intractable in practice,
+ so we also discuss several approximations that will allow us to select
+ samples efficiently.
+\end_layout
+
+\begin_layout Standard
+Firstly, we assume that the number 
+\begin_inset Formula $N$
+\end_inset
+
+ of 
+\emph on
+function evaluations
+\emph default
+ (FEs) the optimiser is allowed to make is proportional to the dimensionality
+ 
+\begin_inset Formula $D$
+\end_inset
+
+.
+ For this project, ten function evaluations were allowed for each dimension,
+ so that 
+\begin_inset Formula $N=10\cdot D$
+\end_inset
+
+.
+ This was mainly for practical purposes, to allow experiments to run for
+ a practical amount of time.
+ However, it can be partially justified, as 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+ claim that GPO's main strength in comparison to other optimisers is precisely
+ this low-budget case.
+ This is not to say that a larger budget is not possible, but the speed
+ of the implementation does limit this somewhat.
+ Fast approximations for increasing this limit were discussed in 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:gauss-cond"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Now, let 
+\begin_inset Formula $M_{k}(x_{1\ldots k},y_{1\ldots k})$
+\end_inset
+
+ be the expected utility we will obtain if we choose the next sample 
+\begin_inset Formula $x_{k+1}$
+\end_inset
+
+ optimally --- that is, so that it maximises expected utility --- given
+ we have already sampled 
+\begin_inset Formula $x_{1\ldots k}=\{x_{t}:t=1\ldots k\}$
+\end_inset
+
+ and observed 
+\begin_inset Formula $y_{1\ldots k}=\{y_{t}:t=1\ldots k\}$
+\end_inset
+
+.
+ Note that, although we only consider sequential sampling schemes here,
+ it is also possible to sample batches of points in parallel 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PBOML2012"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $M_{N}$
+\end_inset
+
+ is a special case as we have already chosen all of our samples, and so
+ the final 
+\begin_inset Formula $(N+1)$
+\end_inset
+
+th decision is to report the maximiser 
+\begin_inset Formula $x^{*}\in X=x_{1\ldots N}$
+\end_inset
+
+.
+ Therefore we have 
+\begin_inset Formula 
+\[
+M_{N}(x_{1\ldots N},y_{1\ldots N})=\max_{x^{*}\in X}\E[\underbrace{f(x^{*})}_{U}|x^{*},x_{1\ldots N},y_{1\ldots N}]=\max_{x^{*}\in X}f(x^{*})=\max_{y^{*}\in Y}y^{*}
+\]
+
+\end_inset
+
+ since all potentially reportable maxima 
+\begin_inset Formula $f(x^{*})=y^{*}\in Y$
+\end_inset
+
+ are known with certainty by this point.
+ Taking one step back to 
+\begin_inset Formula $M_{N-1}$
+\end_inset
+
+, we have two decisions to make in sequence, 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ and then 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+.
+ Since we're assuming 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ and 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ will both be chosen optimally, and 
+\begin_inset Formula $M_{N}$
+\end_inset
+
+ gives the expected utility when 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ is chosen optimally, we can invoke the tower property of conditional expectatio
+n to obtain 
+\begin_inset Formula 
+\begin{align*}
+M_{N-1}(x_{1\ldots N-1},y_{1\ldots N-1}) & =\max_{x_{N}}\E[M_{N}(x_{1\ldots N-1}\cup\{x_{N}\},y_{1\ldots N-1}\cup\{y_{N}\})|x_{N},x_{1\ldots N-1},y_{1\ldots N-1}]
+\end{align*}
+
+\end_inset
+
+ Note that all of the terms in the expectation are known except for 
+\begin_inset Formula $y_{N}$
+\end_inset
+
+.
+ We can simplify this expression by substituting definitions 
+\begin_inset Formula 
+\begin{align*}
+M_{N-1}(x_{1\ldots N-1},y_{1\ldots N-1}) & =\max_{x_{N}}\E\left[\max_{y^{*}\in Y}y^{*}\bigg|x_{1\ldots N},y_{1\ldots N-1}\right]\\
+ & =\max_{x_{N}}\E[\max\{y_{N},\eta\}|x_{1\ldots N},y_{1\ldots N-1}],\quad\text{where }\eta=\max y_{1\ldots N-1}\\
+ & =\eta+\max_{x_{N}}\E[I|x_{1\ldots N},y_{1\ldots N-1}],\quad\text{where }I=\max\left\{ y_{N}-\eta,0\right\} 
+\end{align*}
+
+\end_inset
+
+ where 
+\begin_inset Formula $I$
+\end_inset
+
+ is the 
+\emph on
+improvement
+\emph default
+ of 
+\begin_inset Formula $y_{N}=f(x_{N})$
+\end_inset
+
+ over the previous maximum 
+\begin_inset Formula $\eta$
+\end_inset
+
+.
+ By induction we can provide a similar definition for 
+\begin_inset Formula $M_{k}$
+\end_inset
+
+ for the more general case 
+\begin_inset Formula $k<N$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align*}
+M_{k}(x_{1\ldots k},y_{1\ldots k}) & =\max_{x_{k+1}}\E[M_{k+1}(x_{1\ldots k}\cup\{x_{k+1}\},y_{1\ldots k}\cup\{y_{k+1}\})|x_{k+1},x_{1\ldots k},y_{1\ldots k}]
+\end{align*}
+
+\end_inset
+
+ with the special cases 
+\begin_inset Formula 
+\begin{align*}
+M_{1}(x_{1},y_{1}) & =\max_{x_{2}}\E[M_{2}(\{x_{1},x_{2}\},\{y_{1},y_{2}\})|x_{2},x_{1},y_{1}]\\
+M_{0} & =\max_{x_{1}}\E[M_{1}(x_{1},y_{1})|x_{1}]
+\end{align*}
+
+\end_inset
+
+ It follows that the optimal actions are defined by the following equations
+ 
+\begin_inset Formula 
+\begin{align*}
+x_{1} & =\argmax_{x_{1}}\E[M_{1}(x_{1},y_{1})|x_{1}]\\
+x_{2}|x_{1},y_{1} & =\argmax_{x_{2}}\E[M_{2}(\{x_{1},x_{2}\},\{y_{1},y_{2}\})|x_{2},x_{1},y_{1}]\\
+x_{k}|x_{1\ldots k-1},y_{1\ldots k-1} & =\argmax_{x_{k}}\E[M_{k}(x_{1\ldots k-1}\cup\{x_{k}\},y_{1\ldots k-1}\cup\{y_{k}\})|x_{k},x_{1\ldots k-1},y_{1\ldots k-1}]\\
+x_{N}|x_{1\ldots N-1},y_{1\ldots N-1} & =\argmax_{x_{N}}\E[I|x_{1\ldots N},y_{1\ldots N-1}]\\
+x^{*}|x_{1\ldots N},y_{1\ldots N} & =\argmax_{x^{*}\in X}f(x^{*})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Approximations
+\end_layout
+
+\begin_layout Standard
+The recurrences derived above show that our decision problem displays the
+ optimal substructure required for a dynamic programming implementation.
+ However, given the large space of possible action 
+\begin_inset Formula $x_{1\ldots k}$
+\end_inset
+
+ and observation 
+\begin_inset Formula $y_{1\ldots k}$
+\end_inset
+
+ trajectories, there is unlikely to be enough overlapping sub-problems for
+ this to be done tractably.
+ Therefore, we need to turn to approximations.
+\end_layout
+
+\begin_layout Standard
+Let's begin by looking more closely at how to select the final sample 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+.
+ Since our objective function is modelled by a GP, the improvement 
+\begin_inset Formula $I$
+\end_inset
+
+ is simply a truncated Gaussian, with mean 
+\begin_inset Formula $\E(y_{N}|y_{N}>\eta)=\mu+\sigma\cdot\varphi(Z)/\Phi(Z)$
+\end_inset
+
+ where 
+\begin_inset Formula $Z=-(\eta-\mu)/\sigma$
+\end_inset
+
+, 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ are the mean and standard deviation of the predictive distribution of 
+\begin_inset Formula $y_{N}=f(x_{N})$
+\end_inset
+
+, and 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ and 
+\begin_inset Formula $\varphi=\Phi^{\prime}$
+\end_inset
+
+ are the standard Gaussian cdf.
+\begin_inset space \space{}
+\end_inset
+
+and pdf.
+\begin_inset space \space{}
+\end_inset
+
+ respectively.
+ Also note that 
+\begin_inset Formula $y_{N}$
+\end_inset
+
+ is greater than 
+\begin_inset Formula $\eta$
+\end_inset
+
+ with probability 
+\begin_inset Formula 
+\[
+\mathrm{Pr}(y_{N}>\eta)=\mathrm{Pr}\left(\frac{y_{N}-\mu}{\sigma}>-Z\right)=\mathrm{Pr}\left(\frac{y_{N}-\mu}{\sigma}<Z\right)=\Phi(Z)
+\]
+
+\end_inset
+
+Therefore, the 
+\emph on
+expected improvement
+\emph default
+ (EI) 
+\begin_inset Formula 
+\begin{align}
+\E[I|x_{1\ldots N},y_{1\ldots N-1}] & =\E(y_{N}-\eta|y_{N}>\eta)\cdot\mathrm{Pr}(y_{N}>\eta)+\E(0|y_{N}\leq\eta)\cdot\mathrm{Pr}(y_{N}\leq\eta)\nonumber \\
+ & =\left[\E(y_{N}|y_{N}>\eta)-\eta\right]\cdot\Phi(Z)+0\nonumber \\
+ & =(\mu-\eta)\cdot\Phi(Z)+\sigma\cdot\phi(Z)\label{eq:ei}
+\end{align}
+
+\end_inset
+
+ It can be seen that this quantity is quite easy to compute, with 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ as its maximiser.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 6.2"
+key "Osborne2010"
+
+\end_inset
+
+ provides a similar derivation, but erroneously claims the expression should
+ contain the variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ rather than the standard deviation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ He also claims that the expression as stated here is dimensionally invalid
+ but, as far as the present author can determine, it is not --- 
+\begin_inset Formula $\mu$
+\end_inset
+
+, 
+\begin_inset Formula $\eta$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ are all measured in function-output units, and hence it is 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ that would be dimensionally invalid.
+\end_layout
+
+\end_inset
+
+ We will return to the question of how to actually find the maximum later.
+ For now it is sufficient to note that finding the optimal value of 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ is much easier than finding that of 
+\begin_inset Formula $x_{k}$
+\end_inset
+
+ for 
+\begin_inset Formula $k\ll N$
+\end_inset
+
+.
+ Therefore, a potential approximation is to treat every sample as if it's
+ the last, completely ignoring the issue of how the current sample will
+ affect any future ones.
+ This type of approximation is known as 
+\emph on
+greedy
+\emph default
+, 
+\emph on
+myopic
+\emph default
+, or 
+\emph on
+single-step lookahead
+\emph default
+.
+ How well the approximation performs in practice will be affected by the
+ actual strength of the dependence between successive samples.
+\end_layout
+
+\begin_layout Standard
+This EI criteria 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BOtut2010,PBOML2012,FreanBoyle2008"
+
+\end_inset
+
+ is the approximation that was utilised during this project, but it is still
+ of interest to consider other more accurate approximations.
+ The obvious extension is a two-step lookahead, where we treat every sample
+ as if it were the penultimate one.
+ In particular, we have 
+\begin_inset Formula 
+\begin{align*}
+x_{N-1}|x_{1\ldots N-2},y_{1\ldots N-2} & =\argmax_{x_{N-1}}\E\left[\max_{x_{N}}\E[I|x_{1\ldots N},y_{1\ldots N-1}]\bigg|x_{1\ldots N-1},y_{1\ldots N-2}\right]
+\end{align*}
+
+\end_inset
+
+ It is not quite as easy to solve this expectation analytically as it was
+ before, and therefore we must approximate it numerically.
+ This is complicated by the fact that EI needs to be maximised with respect
+ to 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ within the integrand, which is non-trivial in itself.
+ However, as we are using a GP with a squared exponential kernel, the correlatio
+n between points further than a few length-scales apart is negligible,
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In certain applications this may in fact be a reason 
+\emph on
+not
+\emph default
+ to use these kernels, when long-range dependencies are important.
+\end_layout
+
+\end_inset
+
+ so our posterior on the objective function undergoes only localised changes
+ with each new sample.
+ Therefore, any potential increases in EI will only occur in this local
+ region.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MudgeThesis"
+
+\end_inset
+
+ exploits this fact by averaging the EI over a sample of nearby points,
+ in order to recognise the regions where a future increase in EI is possible.
+ A more accurate, but potentially more expensive, approximation to 
+\begin_inset Formula $\E U$
+\end_inset
+
+ at any given 
+\begin_inset Formula $x_{N-1}$
+\end_inset
+
+ is the following.
+ Note that the only stochastic quantity in the integrand is 
+\begin_inset Formula $y_{N-1}=f(x_{N-1})$
+\end_inset
+
+, within 
+\begin_inset Formula $\eta=\max\{y_{N-1},\max y_{1\ldots N-2}\}$
+\end_inset
+
+.
+ Therefore the above expectation is only a 1-D integral, easily approximated
+ by sampling it at a number of points, either by randomly drawing from the
+ predictive distribution, or deterministically dividing it into a number
+ of quantiles.
+\end_layout
+
+\begin_layout Standard
+For each sample of 
+\begin_inset Formula $y_{N-1}$
+\end_inset
+
+, there are two possibilities.
+ The first is that the local changes to EI are not significant enough to
+ cause its overall maximum to increase, in which case the integrand is simply
+ equal to the current maximum EI obtained outside the local region.
+ The second is that the change in the posterior of 
+\begin_inset Formula $f$
+\end_inset
+
+ is significant enough to cause the EI maximum to move to a new point 
+\begin_inset Formula $x^{\prime}$
+\end_inset
+
+ nearby 
+\begin_inset Formula $x_{N-1}$
+\end_inset
+
+.
+ In this case the integrand is increased to the new EI at this point 
+\begin_inset Formula $x^{\prime}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Determining whether EI has increased significantly in the neighbourhood
+ of 
+\begin_inset Formula $x_{N-1}$
+\end_inset
+
+ is not an entirely trivial matter.
+ However, it may be sufficient to use local optimisation methods to search
+ the local maxima surrounding 
+\begin_inset Formula $x_{N-1}$
+\end_inset
+
+.
+ This could be done reasonably efficiently by exploiting the structure of
+ the EI surface, using gradient information at the very least.
+\end_layout
+
+\begin_layout Standard
+Extending multi-step lookahead further beyond this becomes increasing difficult.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 6.3"
+key "Osborne2010"
+
+\end_inset
+
+ describes how it may be done in principle, but notes that a naive implementatio
+n will be quite computationally demanding in practice.
+ Therefore, it is clear that being able to look more than a few steps ahead
+ will require aggressive approximations.
+ It would be of interest to investigate whether 
+\emph on
+Monte Carlo tree search
+\emph default
+ (MCTS) techniques 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MCTS2012"
+
+\end_inset
+
+ would be applicable to this problem.
+ MCTS has been successfully used in a number of difficult sequential decision
+ problems, such as playing computer Go.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+It is interesting to note that MCTS encounters similar problems to GPO in
+ terms of trading exploration for exploitation, and needs to decide which
+ branches of the decision tree would be most helpful to sample, similarly
+ to how GPO needs to decide which points to sample from the objective function.
+ Therefore, it may be possible to decompose an implementation of GPO with
+ MCTS into a hierarchy of (progressively simpler) decision sub-problems.
+ Since each decision problem would have multiple sub-problems, computational
+ expense becomes much more important further down the hierarchy.
+ We can no longer afford to make the assumption that computation is free
+ by leaving it absent from the utility function, as otherwise the recursive
+ partitioning into sub-problems would likely never reach a base level that
+ can be cheaply computed.
+ If these (non-trivial) issues were to be taken care of, it is possible
+ that GPO could be implemented in a fully Bayesian manner, with approximations
+ being applied at each level of the hierarchy to sufficiently accommodate
+ the computational resource usage penalties described by the relevant utility
+ functions.
+ However, this should all be treated as speculation, obviously it was beyond
+ the scope of this project to investigate such options more thoroughly.
+ See 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "SelectComp2012"
+
+\end_inset
+
+ for some recent work on this 
+\emph on
+Bayesian meta-reasoning
+\emph default
+ problem, with applications to MCTS.
+\end_layout
+
+\end_inset
+
+ It is possible that there may also be other relevant techniques in the
+ fields of (stochastic) control theory, operations research, or automated
+ planning, by re-interpreting GPO as a 
+\emph on
+partially observable Markov decision process
+\emph default
+ (POMDP) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Toussaint2014"
+
+\end_inset
+
+.
+ However, investigating this any further was beyond the scope of this project,
+ and is left as a potential future research direction.
+\end_layout
+
+\begin_layout Subsection
+Making Decisions
+\end_layout
+
+\begin_layout Standard
+We should note that maximising EI 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ei"
+
+\end_inset
+
+, and multi-step extensions thereof, is not the only option for making decisions
+ within GPO.
+ Two other commonly used alternatives are 
+\emph on
+probability of improvement
+\emph default
+ (PI), and the 
+\emph on
+upper confidence bound
+\emph default
+ (UCB) criteria from multi-armed bandit theory 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 2.3"
+key "BOtut2010"
+
+\end_inset
+
+.
+ However, 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 2.3"
+key "BOtut2010"
+
+\end_inset
+
+ shows that PI can perform quite poorly compared to EI, but EI and UCB tend
+ to induce similar behaviour.
+ Additionally, as neither PI nor UCB are based on expected utility theory,
+ they lack many of the benefits of such a coherent approach, such as the
+ conceptual ease with which EI can be extended to multi-step lookahead.
+ Therefore, neither of these alternatives were considered for this project,
+ and they do not in themselves appear to be particularly promising research
+ directions.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+If we wanted the optimiser to report the 
+\emph on
+most probable
+\emph default
+ maximum, we could set the utility to be the indicator function 
+\begin_inset Formula $U=[x^{*}=\argmax_{x}f(x)]$
+\end_inset
+
+ which takes value one (and zero otherwise) if and only if the reported
+ maximiser 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ is the true (but unknown) maximiser of the objective function 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ If instead we wished to maximise the probability that the maximum was greater
+ than some threshold 
+\begin_inset Formula $\hat{y}$
+\end_inset
+
+, then we could set 
+\begin_inset Formula $U=[f(x^{*})>\hat{y}]$
+\end_inset
+
+.
+ In both cases, 
+\begin_inset Formula $\E U$
+\end_inset
+
+ is simply the probability of the corresponding proposition.
+ Finding good approximations to utilities such as these would likely result
+ in better performance than the rather myopic and 
+\emph on
+ad hoc
+\emph default
+ PI criteria.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Whatever function we choose to maximise in order to select samples, be it
+ EI or otherwise, we require an optimisation algorithm to find the maximum.
+ Clearly this is not a trivial matter --- if it were, then there would be
+ little purpose to inventing new global optimisers such as GPO.
+ Selecting good samples is essential as, unsurprisingly, poor samples can
+ have a significant impact on overall performance (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:res"
+
+\end_inset
+
+).
+ However, this problem does not seem to get anywhere near the attention
+ it deserves, and appears to be something of an afterthought much of the
+ time --- with people simply plugging in general purpose global optimisers
+ such as DIRECT 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BOtut2010"
+
+\end_inset
+
+, conjugate gradient (CG) with random restarts 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "FreanBoyle2008"
+
+\end_inset
+
+, or even state-of-the-art competitors to GPO such as CMA-ES 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+.
+ The latter is particularly unacceptable as not only will it result in GPO
+ being much slower than directly applying CMA-ES to the problem, but it
+ also raises questions as to whether it is GPO or CMA-ES that is doing all
+ of the heavy lifting.
+\end_layout
+
+\begin_layout Standard
+Ideally, we would like to tailor an optimiser to the structure of the EI
+ function, in a similar way to how Markov chain Monte Carlo (MCMC) samplers
+ are tailored to the structure of probabilistic models in order to perform
+ inference tractably.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In fact, by unifying decision-making with inference (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:utility-just"
+
+\end_inset
+
+), it may even be possible to apply inference algorithms like MCMC directly
+ to this problem.
+\end_layout
+
+\end_inset
+
+ In principle, it should be possible to exploit the structure of the EI
+ surface
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Roughly speaking, EI is small immediately surrounding previous samples and
+ the regions around samples with low function values, moderate in highly
+ uncertain regions with no existing samples, and high in the regions around
+ samples with high function values.
+ 
+\end_layout
+
+\end_inset
+
+ in order to locate the maximum with much less effort than a general-purpose
+ optimiser supplied with none of this structural information.
+\end_layout
+
+\begin_layout Standard
+Another problem is the fact that EI has the same input dimensionality as
+ the external objective function, and therefore the scalability of GPO to
+ high dimensions directly depends on that of the EI optimiser.
+ Utilising structural information could help to alleviate this problem also.
+ We again draw an analogy to MCMC inference methods which, by exploiting
+ information about the structure of joint probability distributions, are
+ known to scale quite well to high dimensions 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 29.1"
+key "mackay:itila"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Unfortunately, investigating this issue in any great detail was beyond the
+ scope of this project, so EI was simply maximised with CG,
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Simulated annealing with standard parameters was also tested, which obtained
+ similar levels of performance, and therefore results of which are omitted
+ for brevity.
+\end_layout
+
+\end_inset
+
+ restarting twenty times from points sampled uniformly from the input space.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "FreanBoyle2008"
+
+\end_inset
+
+ provides the necessary analytic expressions for calculating the gradient
+ of EI.
+\end_layout
+
+\begin_layout Section
+Observation Noise
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:noise"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this project, it was assumed that 
+\emph on
+noiseless observations
+\emph default
+ 
+\begin_inset Formula $y_{t}=f(x_{t})$
+\end_inset
+
+ of the objective function are available.
+ It is relatively simple to update the model to handle noisy observations
+ 
+\begin_inset Formula $y_{t}=f(x_{t})+\varepsilon_{t}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varepsilon_{t}\sim\mathcal{N}(0,\sigma_{\text{noise}}^{2})$
+\end_inset
+
+ is independent Gaussian noise.
+ However, for significant amounts of noise, the implications on the approximatio
+ns required to implement the model can be non-trivial.
+\end_layout
+
+\begin_layout Standard
+In particular, EI 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ei"
+
+\end_inset
+
+ does not handle large amounts of output noise very well, which is not particula
+rly surprising as it was derived from a noise-free assumption.
+ In order to see what would need to change in this case, let's repeat the
+ derivation from the previous section with a noisy observation model.
+ Now 
+\begin_inset Formula 
+\[
+M_{N}^{\prime}(x_{1\ldots N},y_{1\ldots N})=\max_{x^{*}\in X}\E[\underbrace{f(x^{*})}_{U}|x^{*},x_{1\ldots N},y_{1\ldots N}]=\max_{x^{*}\in X}\mu_{N}(x^{*})
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $\mu_{N}$
+\end_inset
+
+ is the posterior predictive mean of the GP at 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+, given the previous observations 
+\begin_inset Formula $x_{1\ldots N},y_{1\ldots N}$
+\end_inset
+
+.
+ Note that, since function values are not known with certainty at the sampled
+ points, we now have to maximise the 
+\emph on
+predictive mean
+\emph default
+ rather than maximising the sampled value 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 2.4"
+key "BOtut2010"
+
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula 
+\begin{align*}
+M_{N-1}^{\prime}(x_{1\ldots N-1},y_{1\ldots N-1}) & =\max_{x_{N}}\E\left[\max_{x^{*}\in X}\mu_{N}(x^{*})\bigg|x_{1\ldots N},y_{1\ldots N-1}\right]
+\end{align*}
+
+\end_inset
+
+ That is, instead of calculating the expected improvement over the previous
+ best sample, we determine that of the predictive mean over the set of sampled
+ points.
+\end_layout
+
+\begin_layout Standard
+Note that the improvement to the predictive mean does not necessarily occur
+ at the location of the new sample 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+, because in some cases the sample at 
+\begin_inset Formula $x_{N}$
+\end_inset
+
+ could in fact cause the predictive mean to increase somewhere else 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MudgeThesis"
+
+\end_inset
+
+.
+ However, if we assume that the latter is not of significant concern, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MudgeThesis"
+
+\end_inset
+
+ shows that the expected improvement in mean is given by 
+\begin_inset Formula $(\mu-\hat{\mu})\cdot\Phi(Z)+w\cdot\sigma\cdot\varphi(Z)$
+\end_inset
+
+ where 
+\begin_inset Formula $Z=(\mu-\hat{\mu})/(w\cdot\sigma)$
+\end_inset
+
+, 
+\begin_inset Formula $w=1-\sigma_{\text{noise}}^{2}/\sigma^{2}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\mu}$
+\end_inset
+
+ is the previous best mean, and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ are the parameters of the distribution of 
+\begin_inset Formula $y_{N}$
+\end_inset
+
+.
+ He also demonstrates that this method performs significantly better than
+ standard EI in some cases, particularly when dealing with (noisy) multi-modal
+ objective functions.
+\end_layout
+
+\begin_layout Standard
+The above derivation assumes that we are using the same utility as before,
+ and obviously would differ for other choices of 
+\begin_inset Formula $U$
+\end_inset
+
+.
+ For example, if the utility penalised large deviations between the reported
+ maximum and the true function value at that point, then 
+\begin_inset Formula $M_{N}^{\prime}$
+\end_inset
+
+ would also refer to the predictive uncertainty of the underlying function
+ value 
+\begin_inset Formula $f(x^{*})$
+\end_inset
+
+.
+ This would also allow us to relax the constraint on the maximiser from
+ 
+\begin_inset Formula $x^{*}\in X$
+\end_inset
+
+ to 
+\begin_inset Formula $x^{*}\in\mathbb{R}$
+\end_inset
+
+, without fear of 
+\begin_inset Formula $x^{*}$
+\end_inset
+
+ being selected from a highly uncertain region.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 6.5"
+key "Osborne2010"
+
+\end_inset
+
+ suggests simply disallowing regions where predictive variance exceeds a
+ set threshold, but this seems rather 
+\emph on
+ad hoc
+\emph default
+, and does not account for the fact that we may be willing to tolerate a
+ greater amount of uncertainty depending on the size of the mean.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Experimental Results
+\end_layout
+
+\begin_layout Standard
+This chapter presents experimental results demonstrating the behaviour and
+ performance of GPO, firstly with respect to a few informal test functions,
+ followed by the more rigorous Black-Box Optimisation Benchmark (BBOB).
+\end_layout
+
+\begin_layout Section
+Informal Behaviour Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:exp-informal"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "app:code"
+
+\end_inset
+
+ provides some detailed visualisations of the behaviour of GPO using EI
+ (GPO-EI) on both a simple sinusoidal test function, as well as the case
+ where the objective function is actually sampled from GP, in one and two
+ dimensions.
+ From these plots, it can be seen that GPO-EI tends to alternate between
+ 
+\emph on
+exploring
+\emph default
+ uncertain (high-variance) regions and 
+\emph on
+exploiting
+\emph default
+ sampled high-mean regions.
+ If it is in the exploration phase and stumbles upon a large function value,
+ it immediately switches to exploitation mode and takes a number of samples
+ in the surrounding area, in an attempt to improve on the local maxima.
+ Once it has taken enough samples to reduce the level of uncertainty ---
+ such that it deems that it has located the maximal point in that region
+ --- it reverts to exploration mode, sampling points spread across the regions
+ of high uncertainty.
+ This process continues until it has exhausted all promising regions of
+ the space.
+\end_layout
+
+\begin_layout Standard
+It should be noted that none of this behaviour has been explicitly programmed,
+ it simply emerges naturally from the EI criteria.
+ However, due to the myopic nature of EI, this two-mode behaviour is a rather
+ simple strategy.
+ If multi-step approximations were to be used instead (
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:utility"
+
+\end_inset
+
+) then one would expect more strategic behaviour to emerge.
+ For example, the sampling process might focus on exploring the space initially,
+ before turning to exploitation in the later stages of the optimisation
+ process --- rather than spending a large number of samples exploiting every
+ local maxima encountered.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+One could argue that EI corresponds to the assumption that the optimiser
+ could be terminated at any time without warning, and so greedily exploiting
+ maxima whilst it has the chance is the sensible thing to do under the circumsta
+nces.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_1.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+1-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_3.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_5.png
+	scale 50
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+5-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_8.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+10-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_10.png
+	scale 50
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+20-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_12.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+50-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_14.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+100-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Comparison of GPO with simulated annealing, on objective functions sampled
+ from a GP
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:gpo-vs-sa"
+
+\end_inset
+
+ These plots show the greatest function value obtained by either optimiser
+ (
+\begin_inset Formula $y$
+\end_inset
+
+-axis) versus the number of function evaluations used (
+\begin_inset Formula $x$
+\end_inset
+
+-axis).
+ GPO is in blue, and simulated annealing in red.
+ The ghosted lines show the results of 25 independent trials, with the thick
+ lines being an average of these.
+ In each trial, the objective function was independently sampled from a
+ zero-mean GP with the unit-lengthscale squared-exponential kernel.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:gpo-vs-sa"
+
+\end_inset
+
+ provides a simple performance comparison between GPO-EI and simulated annealing.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Specifically, the 
+\family typewriter
+anneal
+\family default
+ procedure provided by SciPy was used with default parameters.
+\end_layout
+
+\end_inset
+
+ Thick lines show the average maximal function value obtained over a 
+\begin_inset Quotes eld
+\end_inset
+
+large
+\begin_inset Quotes erd
+\end_inset
+
+ number of trials, and can therefore be interpreted as (a Monte Carlo estimate
+ of) the expected utility obtained by the optimisers for a range of FE budgets.
+ Clearly simulated annealing is not the most formidable opponent to be casting
+ comparisons against, but this brief experiment does demonstrate that GPO
+ has the potential to perform quite well, particularly when its assumptions
+ accurately match the objective function.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+In this case, the objective function is sampled directly from the prior
+ distribution on 
+\begin_inset Formula $f$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ Of particular interest is the fact that GPO does not get stuck on local
+ maxima, and continues to explore the space as long as it feels the need
+ to gather more information.
+\end_layout
+
+\begin_layout Standard
+These plots also demonstrate the need for benchmarking high-dimensional
+ functions, as both optimisers perform reasonably similarly in 1-D.
+ However, as dimensionality increases, so does the number of function evaluation
+s required to differentiate between the optimisers, which (as discussed
+ earlier) can be something of a challenge for GPO implementations.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Black-Box Optimisation Benchmark
+\end_layout
+
+\begin_layout Standard
+The Black-Box Optimisation Benchmark (BBOB) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "hansen2010exp,wp200901_2010,hansen2010fun"
+
+\end_inset
+
+ is a collection of test functions that have been commonly employed in the
+ literature as a means of benchmarking black-box optimisation algorithms.
+ It also provides libraries for automatically running an optimisation algorithm
+ on a number of random variations of these functions, as well as tools for
+ producing the visualisations provided below in Figures 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ref{fig:RLDs05Da
+\backslash
+algfolder}--
+\backslash
+ref{fig:ERTgraphs
+\backslash
+algfolder}
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Analysis
+\end_layout
+
+\begin_layout Standard
+We begin by briefly analysing how BBOB relates to the concerns outlined
+ in 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:bbo"
+
+\end_inset
+
+.
+ The benchmark encodes our prior assumptions about the kinds of functions
+ black-box optimisers should be able to handle in practice --- as expressed
+ by the prior distribution from which the objective functions are generated,
+ as well as the utility function generated by the ranking criteria.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+This ranking may not be entirely trivial, as it depends on how one combines
+ all of the information from the various plots and statistics in order to
+ assign preferences between different algorithms.
+ To simplify things, we might simply consider how many trials in which the
+ optimiser 
+\begin_inset Quotes eld
+\end_inset
+
+solved
+\begin_inset Quotes erd
+\end_inset
+
+ the maximum of the objective function to within a specified threshold after
+ a fixed budget of FEs.
+ In a real application, this would likely be set to more accurately model
+ problem-specific concerns.
+\end_layout
+
+\end_inset
+
+ If these assumptions are an accurate reflection of real optimisation problems,
+ then it is not necessary to be superstitious about an optimiser 
+\begin_inset Quotes eld
+\end_inset
+
+overfitting
+\begin_inset Quotes erd
+\end_inset
+
+ the benchmark.
+ The empirical results (averaging over a number of trials) will essentially
+ be a Monte Carlo estimate of the expected utility of running each optimiser,
+ and hence the optimiser obtaining the best performance on the benchmark
+ will also be the best choice according to MEU.
+\end_layout
+
+\begin_layout Standard
+However, the question is whether the BBOB test functions are an accurate
+ reflection of the range of difficulty that can be encountered in real optimisat
+ion problems.
+ It is not too difficult to see that, in terms of the two sub-problems outlined
+ in 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:bbo"
+
+\end_inset
+
+ --- the minimum number of function evaluations required to extract the
+ necessary information from the objective function, and the subsequent computati
+onal difficult of optimising the inferred model --- most of the test functions
+ should not be overly difficult to solve in principle.
+ Specifically, all of the functions are generated from parametric models
+ with relatively few (randomly-selected) parameters, and these models can
+ be maximised analytically once sufficient information has been gathered
+ in order to determine the relevant parameters.
+\end_layout
+
+\begin_layout Standard
+Of course, the problem is somewhat more difficult if we assume we cannot
+ make use of the definitions provided for the models used to generate the
+ objective functions.
+ However, assume that we only knew that these generative models existed
+ and could analytically defined quite concisely.
+ In principle, it would be possible to search over the space of such models
+ in a manner similar to 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "autophys2009"
+
+\end_inset
+
+.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Or RIES: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://mrob.com/pub/ries/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Obviously actually implementing this was beyond the scope of this project,
+ but it illustrates the fact that the functions included in benchmarks such
+ as BBOB likely do not capture the full complexity of optimisation problems
+ that may be encountered in practice.
+\end_layout
+
+\begin_layout Subsection
+Results
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:res"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Testing was performed utilising the standard BBOB framework and scripts.
+ Due to time constraints, the optional 40-D objective functions were not
+ considered.
+ A number of trials were performed, with the objective function being randomly
+ generated at the beginning of each trial.
+ Each trial began by providing GPO with a single observation uniformly sampled
+ from the 
+\begin_inset Formula $[-4,4]^{D}$
+\end_inset
+
+ hypercube, and any further samples chosen by GPO were constrained to lie
+ within the 
+\begin_inset Formula $[-5,5]^{D}$
+\end_inset
+
+ hypercube.
+ For each of these samples, GPO was provided with the corresponding value
+ of the objective function.
+ The GPO implementation terminated and returned the best point observed
+ so far when it either reached the FE budget, found a maximum
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+It should be noted that BBOB phrases optimisation in terms of minimisation,
+ so function values were always negated when being passed in or out of the
+ GPO implementation.
+\end_layout
+
+\end_inset
+
+ greater than the target value provided by BBOB, or was unable to find a
+ point to sample with non-negligible EI.
+ EI was considered 
+\begin_inset Quotes eld
+\end_inset
+
+negligible
+\begin_inset Quotes erd
+\end_inset
+
+ when it fell below one standard deviation of the numerical noise assumed
+ by the GP model, in this case 
+\begin_inset Formula $\sigma_{\text{noise}}=10^{-3}$
+\end_inset
+
+.
+ This was done to prevent GPO from continuing to sample known local maxima
+ on top of or very close to existing samples.
+ In the case of early termination, BBOB continued to restart GPO from different
+ initial samples until it exhausted its entire function evaluation budget.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ref{fig:RLDs05Da
+\backslash
+algfolder}, 
+\backslash
+ref{fig:RLDs05Db
+\backslash
+algfolder}, 
+\backslash
+ref{fig:RLDs20Db
+\backslash
+algfolder}, and 
+\backslash
+ref{fig:ERTgraphs
+\backslash
+algfolder}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Results are presented in Figures 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+ref{fig:RLDs05Da
+\backslash
+algfolder}--
+\backslash
+ref{fig:ERTgraphs
+\backslash
+algfolder}
+\end_layout
+
+\end_inset
+
+.
+ From these plots, it can be seen that GPO performs respectably in the low-budge
+t case considered here, being able to solve a reasonable proportion of the
+ objective functions to within a threshold set by other state-of-the-art
+ optimisers previously run on the benchmark (Figures 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+ref{fig:RLDs05Da
+\backslash
+algfolder}--
+\backslash
+ref{fig:RLDs20Db
+\backslash
+algfolder}
+\end_layout
+
+\end_inset
+
+), and often requiring fewer function evaluations on average (Figure 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+ref{fig:ERTgraphs
+\backslash
+algfolder}
+\end_layout
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+It is interesting to compare these results with those of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+, who were able to obtain much better performance with a similar model.
+ There were two main differences between their implementation and that utilised
+ in this project.
+ Firstly, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+ used an (isotropic) Matérn kernel instead of the simpler squared-exponential
+ kernel used for this project.
+ However, experimentation performed during this project revealed little
+ difference in performance between the two isotropic kernels, at least for
+ the GPO implementation we were using.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+ also claim that the isotropic kernel performed better in practice than
+ the axis-aligned elliptical kernel used here, as the greater number of
+ free parameters in the latter caused the model to be more prone to overfitting
+ by maximum-likelihood.
+ However, this claim was also unable to be replicated for this project,
+ with the more flexible kernel obtaining noticeably better performance than
+ the isotropic one (at least for the squared-exponential case).
+ In fact, the isotropic kernel was not observed to perform significantly
+ better than when all hyper-parameters were fixed to one.
+\end_layout
+
+\begin_layout Standard
+For the sake of brevity, no evidence to support these observations is provided
+ here, as it was beyond the scope of this project to perform a rigorous
+ comparison of the different kernels.
+ However, it suffices to say that it would be of interest to perform such
+ a comparison more thoroughly than provided here.
+\end_layout
+
+\begin_layout Standard
+The second difference between the two implementations is that 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HutterSMACBBOB2013"
+
+\end_inset
+
+ spent much more time and effort maximising EI, by applying the DIRECT and
+ state-of-the-art CMA-ES global optimisers to the subsidiary optimisation
+ problem.
+ By the authors' own admission, this played a significant role in the success
+ of their implementation.
+ The fact that this single point of difference results in such a large discrepan
+cy in performance shows that the EI-optimisation problem deserves much more
+ attention than it currently receives.
+ For GPO to depend so strongly on a 
+\emph on
+competing
+\emph default
+ black-box optimiser is a rather unsatisfactory solution.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand input
+filename "bbob.tex"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Convergence
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:cvg"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figures 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ei"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ll"
+
+\end_inset
+
+ illustrate the convergence behaviour of the EI and log-likelihood functions
+ respectively.
+ It can be seen from Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ei"
+
+\end_inset
+
+ that, generally speaking, conjugate gradient (with random restarts) has
+ relatively more trouble converging to a unique EI maximum in the early
+ stages, tapering off towards the end.
+ This is not to necessarily say that there are fewer local maxima later
+ on, but simply that they are not spread throughout the input space as much.
+ It is possible that the local maxima of EI tend to concentrate into small
+ regions of the space, making uniform random restarts much less effective.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand cite
+key "FreanBoyle2008"
+
+\end_inset
+
+ suggest restarting from previously sampled points, but care needs to be
+ taken to avoid CG getting stuck in the sharp local minima at these points
+ --- it seems a small amount of random perturbation is necessary to do so.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Differences in behaviour between groups of objective functions becomes much
+ more apparent in higher dimensions, particularly the 20-D case.
+ Functions 1--14 tend to have a large number of convergence points initially,
+ with 1--9 causing GPO to terminate soon afterwards, in contrast to 10--14
+ in which GPO continues sampling but observes fewer maxima.
+ On the other hand, functions 15--24 tend to have a relatively lower number
+ of convergence points, and GPO takes many more samples before terminating.
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ll"
+
+\end_inset
+
+ shows that the log-likelihood has a much higher number of convergence points
+ in comparison to EI, and does not appear to decrease as quickly over time.
+ These plots do not display how much the heights of the convergence points
+ differ from one another, so it is possible that the number of significantly
+ different local maxima is much lower than shown in the plots.
+ However, it does demonstrate that the assumption of a unique peak in the
+ likelihood required for ML and MAP methods cannot be justified without
+ a more thorough investigation of the likelihood surface.
+ Once again, differences between objective functions are most apparent in
+ 20-D, with the ratio of convergence points similar to that observed in
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ei"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another interesting feature to be noted from these plots is the much higher
+ density of points towards the left.
+ This means that a large proportion of the trials terminated before reaching
+ the FE budget, due to GPO being unable to find a potential sample with
+ non-negligible EI.
+ In fact, depending on the type of objective function, 35--55% of all trials
+ terminated immediately after the initial sample.
+ Without further investigation it is difficult to locate the exact cause
+ of this, but a possible scenario is that these are the cases where the
+ initial sample is so large that mean 
+\begin_inset Formula $\mu=0$
+\end_inset
+
+ and signal variance 
+\begin_inset Formula $\theta_{0}=1$
+\end_inset
+
+ assumptions cause GPO to arrive at the conclusion that this is most likely
+ the maximum of the function.
+ If this is the case, relaxing these assumptions would likely result in
+ an improvement, taking care to avoid additional problems due to overfitting.
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:gpo-vs-sa"
+
+\end_inset
+
+ demonstrates that GPO does not have this early-termination problem when
+ its assumptions match the actual structure of the objective function more
+ closely.
+ It therefore seems reasonable to conclude that such behaviour is a symptom
+ of a significant mismatch between the model and reality.
+ The assumptions and implementation details used in this project would need
+ to be revised in order to prevent the optimiser from running out of potential
+ actions so quickly.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data2.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data3.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+3-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data5.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+5-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data10.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+10-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data20.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+20-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Convergence points of EI surface
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:cvg-ei"
+
+\end_inset
+
+ The number of convergence points (
+\begin_inset Formula $y$
+\end_inset
+
+-axis) is defined as the number of local maxima observed across random restarts
+ with heights differing by more than 
+\begin_inset Formula $10^{-3}$
+\end_inset
+
+, versus the number of function evaluations that have been observed by GPO
+ so far (
+\begin_inset Formula $x$
+\end_inset
+
+-axis).
+\end_layout
+
+\begin_layout Plain Layout
+This threshold of 
+\begin_inset Formula $10^{-3}$
+\end_inset
+
+ is probably too small if the maxima are all quite large, but it is enough
+ to give us a rough impression of the structure of the function.
+ More thorough analysis would be required for more rigorous conclusions.
+\end_layout
+
+\begin_layout Plain Layout
+Each group of objective functions is given a different colour: functions
+ 1--5 (separable) in 
+\series bold
+\color black
+black
+\series default
+\color inherit
+, 6--9 (low or moderate conditioning) in 
+\series bold
+\color red
+red
+\series default
+\color inherit
+, 10--14 (high conditioning and unimodal) in 
+\series bold
+\color green
+green
+\series default
+\color inherit
+, 15--19 (multi-modal with adequate global structure) in 
+\series bold
+\color blue
+blue
+\series default
+\color inherit
+, and 20--24 (multi-modal with weak global structure) in 
+\series bold
+\color yellow
+yellow
+\series default
+\color inherit
+.
+\end_layout
+
+\begin_layout Plain Layout
+A small amount of random jitter has been added to the plots to aid visibility.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll2.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll3.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+3-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll5.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+5-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll10.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+10-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll20.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+20-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Convergence points of log-likelihood surface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:cvg-ll"
+
+\end_inset
+
+ See the caption of Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:cvg-ei"
+
+\end_inset
+
+ for details.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data2.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data3.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+3-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data5.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+5-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data10.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+10-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+placement !tbh
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/data20.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+20-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+EI
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:cvg-ei-1"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll2.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll3.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+3-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll5.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+5-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll10.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+10-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+(continued on next page)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ContinuedFloat
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+addtocounter{figure}{1}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/ll20.pdf
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+20-D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+LL
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:cvg-ll-1"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Conclusions and Future Work
+\end_layout
+
+\begin_layout Standard
+The experimental results obtained in this project showed that, whilst being
+ quite a simple model at its core, Gaussian process-based optimisation (GPO)
+ is capable of performing respectably on high-dimensional optimisation tasks,
+ especially when only a small budget of function evaluations is available.
+ However, a number of deficiencies and practical difficulties were uncovered,
+ which suggest several avenues for future research, in the hopes of making
+ GPO a more competitive and practical candidate for black-box optimisation.
+\end_layout
+
+\begin_layout Standard
+A particularly concerning problem that was encountered during this project
+ was the fact that GPO often terminated itself after a relatively small
+ number of function evaluations.
+ Since this problem is not observed when the objective function closely
+ matches GPO's prior assumptions, it seems reasonable to conclude that this
+ behaviour indicates a large disparity between the assumptions and reality.
+ There are a number of ways in which these assumptions can be improved.
+\end_layout
+
+\begin_layout Standard
+The most obvious improvement is to alter the mean and covariance functions
+ of the Gaussian process (GP) prior.
+ The mean function could simply be left constant but inferred from the data,
+ or we could imbue it with prior knowledge about the general structure of
+ the objective surface.
+ A number of standard kernel functions are available to encode different
+ assumptions about covariance structure, and it is possible to combine several
+ kernels to encode even more powerful assumptions 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "RobinsonThesis,AddGP2011,Duvenaud2013"
+
+\end_inset
+
+.
+ There is also the potential for greater flexibility by setting a prior
+ over a set of potential kernels and allowing the best one to be automatically
+ inferred from the data, an idea common in hierarchical Bayesian modelling.
+ Further still, one may wish to partition the space into a number of loosely
+ correlated regions, as a high-dimensional analogue to changepoint detection
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Adams2007,Garnett2009"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A related concern is in assigning appropriate priors to any unknowns in
+ the model, particularly kernel hyper-parameters.
+ These should be informative enough to encode any prior knowledge we have
+ about the structure of the objective, but flexible enough to make the necessary
+ inferences from observed data.
+ There are even opportunities for sharing this information across similar
+ problem instances via hierarchical modelling.
+\end_layout
+
+\begin_layout Standard
+Attention also needs to be paid to how these variables are inferred computationa
+lly.
+ In particular, maximum likelihood methods --- and to a lesser but still
+ significant extent, maximum 
+\emph on
+a posteriori
+\emph default
+ methods --- are prone to overfitting, particularly in the initial stages
+ of the optimisation process when few datapoints have been observed.
+ A solution to this may simply be to provide GPO with a moderately large
+ sample of data from the beginning, but a more flexible approach would be
+ to utilise more accurate inference methods, such as Monte Carlo integration.
+\end_layout
+
+\begin_layout Standard
+Naive inference methods also lead to scalability problems, particularly
+ the ability to tractably handle large numbers of function evaluations.
+ A number of potential solutions to this have been proposed elsewhere, including
+ sparse matrices and the corresponding Markov networks 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GMRF2011,SGCRF2013"
+
+\end_inset
+
+, matrix decomposition and approximation methods 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "GPkepler2014"
+
+\end_inset
+
+, active sets 
+\begin_inset CommandInset citation
+LatexCommand cite
+after "\\S 8"
+key "rasmussen2006gaussian"
+
+\end_inset
+
+, and incremental updating of matrices.
+\end_layout
+
+\begin_layout Standard
+There is also a great deal of room for improvement in the methods utilised
+ for any subsidiary optimisation problems encountered, such as maximising
+ expected improvement (EI).
+ It would be of interest to more thoroughly investigate the structure of
+ the EI surface (and likelihood surfaces too for that matter) in order to
+ determine any structural information that could be exploited for improved
+ accuracy and computational efficiency.
+ By re-interpreting decision-making as a special case of inference 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "PlanInfer2006"
+
+\end_inset
+
+, it may even be possible to apply many powerful inference algorithms directly
+ to this problem.
+\end_layout
+
+\begin_layout Standard
+At a slightly higher level, there are a number of possible variations to
+ the problem set-up described in this report.
+ To start with, the utility function being used here is quite simple, and
+ does not necessarily capture the behaviour one would expect in a practical
+ problem.
+ In particular, it does not make any reference to computational resource
+ usage, costs of function evaluations, the actual utility of different function
+ values, or penalties on large discrepancies between predictions and reality,
+ to name a few.
+ Many of these details are necessary to consider in practice, so it would
+ be helpful to analyse a variety of such utility functions, in order to
+ determine their efficacy as well as the practical implications on implementing
+ the model tractably.
+\end_layout
+
+\begin_layout Standard
+The ability to handle different observation models, particularly additive
+ noise, is another important practical requirement.
+ A number of 
+\emph on
+ad hoc
+\emph default
+ modifications to the decision-making process have been suggested elsewhere,
+ but these have trouble adapting to changes in other parts of the model.
+ Therefore, it is helpful to reconsider the relevant implementation details
+ from first principles (such as the brief derivation in 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+S
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:noise"
+
+\end_inset
+
+) as this provides a greater amount of clarity as to why these modifications
+ are necessary, as well as taking into account the relevant details of the
+ model as a whole.
+\end_layout
+
+\begin_layout Standard
+Casting GPO as a partially observable Markov decision process (POMDP) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Toussaint2014"
+
+\end_inset
+
+ is another potentially fruitful direction to pursue, as it allows general-purpo
+se techniques and approximations to be applied without needing to re-invent
+ the wheel, so to speak.
+ In particular, multi-step lookahead approximations such as Monte Carlo
+ tree search (MCTS) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MCTS2012"
+
+\end_inset
+
+ could allow the optimiser to make much more intelligent and strategic decisions.
+\end_layout
+
+\begin_layout Standard
+Looking at the problem of global optimisation more generally, there are
+ a few potential areas to investigate.
+ Firstly, it would be helpful to compare optimiser implementations on a
+ variety of different benchmarks more reflective of the prior assumptions
+ commonly encountered in real problems.
+ Constructing such benchmarks is a difficult problem in itself, and one
+ should not expect any single benchmark to be universally applicable.
+ However, we should at least consider benchmarks that go beyond parametric
+ models whose maximum can be derived analytically.
+ Otherwise, it is unlikely that the benchmark will capture the full spectrum
+ of difficulties that need to be handled in reality.
+\end_layout
+
+\begin_layout Standard
+Having said that, there are many real problems --- such as those generated
+ by physical systems --- in which the objective function could be accurately
+ modelled by a relatively simple parametric model.
+ In such cases, it would be desirable for an optimiser to exploit this fact.
+ Conceptually at least, we simply need to replace the GP prior on the objective
+ with a more suitable distribution.
+ This would be relatively simple if we had prior knowledge of the exact
+ form of the appropriate parametric model, but this need not be the case.
+ In general, we could make progress by pairing a sufficiently expressive
+ prior with clever computational techniques for searching the space of such
+ models 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "autophys2009"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In addition to this, further analysis of existing state-of-the-art optimisation
+ algorithms from a Bayesian perspective would be beneficial, focussing in
+ particular on separating their (implicit) core assumptions from their implement
+ation details.
+ Doing so could allow these methods to be generalised and adapted to new
+ problems more easily.
+ For example, it may be illuminating to further investigate the connection
+ between optimisers such as CMA-ES and variational methods for Bayesian
+ inference 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "JMLR:v15:wierstra14a,Honkela2007"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Finally, there are a number of general computational issues whose solution
+ would be hugely beneficial to all problems involving decision-making under
+ uncertainty.
+ At the forefront of these is the problem of semi-automatically translating
+ abstract models such as GPO into an efficient concrete implementation.
+ A prerequisite to this is extending the utility function to penalise excessive
+ computation, as well as any other costly actions such as sampling of the
+ objective function, so that the appropriate level of approximation can
+ be formally determined.
+\end_layout
+
+\begin_layout Standard
+In order to generate a space of potential implementations for a given abstract
+ model, we would need a library of automated implementation and approximation
+ strategies, as well as the symbolic and analytic manipulation routines
+ required to apply these methods to the model to derive a concrete implementatio
+n.
+ Of course, it is a non-trivial matter to analyse the accuracy and runtime
+ efficiency of any given implementation in advance of its execution.
+ A brute-force approach would be to simply execute each implementation a
+ number of times, simulating observations by sampling from the prior distributio
+n specified by the model, and averaging utilities to approximate the expectation.
+\end_layout
+
+\begin_layout Standard
+However, such an expensive procedure would likely be intractable, so a more
+ sophisticated framework for selecting implementations would be required
+ in practice.
+ A potential approach to this problem is to note that the implementation
+ process can be interpreted as a decision-making-under-uncertainty problem
+ in itself.
+ More specifically, we are required to select a number of implementation
+ techniques to apply to the abstract model in order to eventually obtain
+ a concrete implementation, but our limited computational resources mean
+ that can never be certain that we have selected the 
+\begin_inset Quotes eld
+\end_inset
+
+best
+\begin_inset Quotes erd
+\end_inset
+
+ implementation (in the sense of maximising expected utility).
+ Perhaps if we can express this problem as a POMDP, then it may be possible
+ to apply a range of existing techniques and approximations (such as MCTS)
+ to derive a solution.
+\end_layout
+
+\begin_layout Standard
+Further work would be required in order to make this tractable for as many
+ practically useful models as possible.
+ As a start in this direction, perhaps we can exploit the fact that a software
+ system is usually comprised of a network of interacting sub-components,
+ whose precise implementation details can often be isolated from one another.
+ It may therefore be possible to confine the computational impact of specific
+ approximations to individual components of the system.
+ By constructing a (suitably simplified) model of how approximations affect
+ the propagation of uncertainty throughout the system, it could be possible
+ to aggregate all of these effects in order to roughly infer the overall
+ accuracy of the implementation, without significant computational expense
+ in doing so.
+ A greater deal of research would be required to determine if these ideas
+ prove useful in practice.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/david/bib/library,theses,bbob,theano,wierstra14a,scipy"
+options "IEEEtranM"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Sample Python Code
+\begin_inset CommandInset label
+LatexCommand label
+name "app:code"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This appendix provides a simple Python implementation of GPO.
+ It should be noted that this is not the final code that was used to generate
+ the BBOB plots, and is merely provided for demonstration purposes.
+\end_layout
+
+\begin_layout Section
+Boilerplate
+\end_layout
+
+\begin_layout Standard
+Imports and a few utility functions:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+from pylab import *
+\end_layout
+
+\begin_layout Plain Layout
+
+from scipy.stats import norm
+\end_layout
+
+\begin_layout Plain Layout
+
+from scipy.spatial.distance import pdist, cdist, squareform
+\end_layout
+
+\begin_layout Plain Layout
+
+from scipy.optimize import anneal
+\end_layout
+
+\begin_layout Plain Layout
+
+from mpl_toolkits.mplot3d import Axes3D
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def ascolumn(xs):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Convert vectors to columns'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    if rank(xs) < 2:
+\end_layout
+
+\begin_layout Plain Layout
+
+        return atleast_2d(xs).T
+\end_layout
+
+\begin_layout Plain Layout
+
+    return asarray(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def grid2d(xmin, xmax, xnum, ymin, ymax, ynum):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''2-D grid as list of coordinates and meshgrid format'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    xs = linspace(xmin,xmax,xnum)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ys = linspace(ymin,ymax,ynum)
+\end_layout
+
+\begin_layout Plain Layout
+
+    # observation matrix (Nx2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    D = array([[x,y] for x in xs for y in ys])
+\end_layout
+
+\begin_layout Plain Layout
+
+    X,Y = meshgrid(xs,ys)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return D,X,Y
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def eye_like(mat):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Identity matrix with same dimensions as given matrix'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    dims = mat.shape
+\end_layout
+
+\begin_layout Plain Layout
+
+    return eye(*dims)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def dqf(A,B):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Calculate diag(A * B * A.T),
+\end_layout
+
+\begin_layout Plain Layout
+
+       see <stackoverflow.com/q/14758283>'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    return einsum('ij,ij->i', dot(A,B), A)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def sameshape(a,b):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Coerce a into the shape of b'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    return asarray(a).reshape(shape(b))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def errbars(ts, mean, sd):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Plot predictive distribution'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    plot(ts, mean, 'k')
+\end_layout
+
+\begin_layout Plain Layout
+
+    plot(ts, mean + 2*sd, '--b')
+\end_layout
+
+\begin_layout Plain Layout
+
+    plot(ts, mean - 2*sd, '--b')
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def norm01(Z):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Normalise all entries into [0,1]'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    zmin = Z.min(); zmax = Z.max()
+\end_layout
+
+\begin_layout Plain Layout
+
+    return (Z - zmin) / (zmax - zmin)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def fc_alpha(Z, A, cmap=cm.jet):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Generate a colormap for Z with alpha values given by A'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    C = cmap(Z)
+\end_layout
+
+\begin_layout Plain Layout
+
+    for i in xrange(C.shape[0]):
+\end_layout
+
+\begin_layout Plain Layout
+
+        for j in xrange(C.shape[1]):
+\end_layout
+
+\begin_layout Plain Layout
+
+            C[i,j][3] = A[i,j]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return C
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+class GPmem(object):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''A function sampled from a GP, with values calculated as needed'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __init__(self, dim):
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.dim = dim
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.d = {tuple([0]*dim) : randn()}
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __call__(self, xs):
+\end_layout
+
+\begin_layout Plain Layout
+
+        if self.dim > 1: xs = atleast_2d(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+        else:            xs = atleast_1d(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+        mean,cov = mvg_cond(self.d.keys(), self.d.values(),
+\end_layout
+
+\begin_layout Plain Layout
+
+                            xs, full=True)
+\end_layout
+
+\begin_layout Plain Layout
+
+        ys = multivariate_normal(atleast_1d(mean), atleast_2d(cov))
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.update(xs, ys)
+\end_layout
+
+\begin_layout Plain Layout
+
+        return ys
+\end_layout
+
+\begin_layout Plain Layout
+
+    def update(self, xs, ys):
+\end_layout
+
+\begin_layout Plain Layout
+
+        for x,y in zip(xs,ys):
+\end_layout
+
+\begin_layout Plain Layout
+
+            self.d[tuple(atleast_1d(x))] = y
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+class Fmem(object):
+\end_layout
+
+\begin_layout Plain Layout
+
+    '''Wraps a function to record any calls made to it'''
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __init__(self, f, lower=-Inf, upper=Inf):
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.xs = []
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.ys = []
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.f = f
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.lower = lower
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.upper = upper
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __call__(self, x):
+\end_layout
+
+\begin_layout Plain Layout
+
+        if any(asarray(x) < asarray(self.lower)) or
+\end_layout
+
+\begin_layout Plain Layout
+
+           any(asarray(x) > asarray(self.upper)):
+\end_layout
+
+\begin_layout Plain Layout
+
+            y = -Inf
+\end_layout
+
+\begin_layout Plain Layout
+
+        else:
+\end_layout
+
+\begin_layout Plain Layout
+
+            y = self.f(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+            self.xs.append(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+            self.ys.append(y)
+\end_layout
+
+\begin_layout Plain Layout
+
+        return y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Squared Exponential Kernel
+\end_layout
+
+\begin_layout Standard
+This function gives the covariance matrix 
+\begin_inset Formula $[K_{\text{SE}}(\text{xs}[i],\text{ys}[j])]_{ij}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def K(xs, ys=None):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if ys is None:
+\end_layout
+
+\begin_layout Plain Layout
+
+        d = squareform(pdist(ascolumn(xs), 'sqeuclidean'))
+\end_layout
+
+\begin_layout Plain Layout
+
+    else:
+\end_layout
+
+\begin_layout Plain Layout
+
+        d = cdist(ascolumn(xs), ascolumn(ys), 'sqeuclidean')
+\end_layout
+
+\begin_layout Plain Layout
+
+    return exp(-d/2)
+\end_layout
+
+\end_inset
+
+ Generate some one- and two-dimensional samples from the GP with this kernel:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+xs = linspace(0,10,100)
+\end_layout
+
+\begin_layout Plain Layout
+
+mean = zeros_like(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+cov = K(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(7):
+\end_layout
+
+\begin_layout Plain Layout
+
+    plot(xs, multivariate_normal(mean, cov))
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_17_0.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+Nx = 45; Ny = 30
+\end_layout
+
+\begin_layout Plain Layout
+
+D,X,Y = grid2d(0,15,Nx, 0,10,Ny)
+\end_layout
+
+\begin_layout Plain Layout
+
+Z = multivariate_normal([0]*(Nx*Ny), K(D))
+\end_layout
+
+\begin_layout Plain Layout
+
+Z = Z.reshape(Nx,Ny).T # cols for x, rows for y
+\end_layout
+
+\begin_layout Plain Layout
+
+contour(X,Y,Z,20)
+\end_layout
+
+\begin_layout Plain Layout
+
+ax = Axes3D(figure())
+\end_layout
+
+\begin_layout Plain Layout
+
+ax.plot_surface(X,Y,Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_19_1.png
+	scale 50
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_19_2.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multivariate Gaussian Conditional Distribution
+\end_layout
+
+\begin_layout Standard
+This class represents the posterior distribution after observing data 
+\begin_inset Formula $(\text{xs},\text{ys})$
+\end_inset
+
+, and gives the predictive distribution of a set of test points ts:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+class GaussCond(object):
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __init__(self, xs, ys, noise=0.001):
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.xs = xs
+\end_layout
+
+\begin_layout Plain Layout
+
+        Kxx = K(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.KxxI = pinv(Kxx + (noise**2) * eye_like(Kxx))
+\end_layout
+
+\begin_layout Plain Layout
+
+        self.KxxI_ys = self.KxxI.dot(ys)
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\end_layout
+
+\begin_layout Plain Layout
+
+    def __call__(self, ts, full=False):
+\end_layout
+
+\begin_layout Plain Layout
+
+        Ktx = K(ts, self.xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+        mean = Ktx.dot(self.KxxI_ys)
+\end_layout
+
+\begin_layout Plain Layout
+
+        if full: # full covariance matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+            cov = K(ts) - Ktx.dot(self.KxxI).dot(Ktx.T)
+\end_layout
+
+\begin_layout Plain Layout
+
+            return mean, cov
+\end_layout
+
+\begin_layout Plain Layout
+
+        else: # predictive variance (diag cov)
+\end_layout
+
+\begin_layout Plain Layout
+
+            # assuming diag(K(ts)) is (approximately) [1,1,...]
+\end_layout
+
+\begin_layout Plain Layout
+
+            var = 1 - dqf(Ktx, self.KxxI)
+\end_layout
+
+\begin_layout Plain Layout
+
+            return squeeze(mean), squeeze(var)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def mvg_cond(xs, ys, ts, full=False, noise=0.001):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return GaussCond(xs, ys, noise)(ts, full)
+\end_layout
+
+\end_inset
+
+ Visualise the GP predictive distribution given data generated from the
+ 1-D function 
+\begin_inset Formula $y=\sin x$
+\end_inset
+
+ and the 2-D function 
+\begin_inset Formula $z=\sin x+\sin y$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+xs = linspace(0,10,7)
+\end_layout
+
+\begin_layout Plain Layout
+
+ys = sin(xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+ts = linspace(0,10,100)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+mean,var = mvg_cond(xs, ys, ts)
+\end_layout
+
+\begin_layout Plain Layout
+
+errbars(ts, mean, sqrt(var)); show()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+mean,cov = mvg_cond(xs, ys, ts, full=True)
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in xrange(1000):
+\end_layout
+
+\begin_layout Plain Layout
+
+    plot(ts, multivariate_normal(mean, cov), 'k', alpha=.01)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_26_0.png
+	scale 50
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_26_1.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def plot_2d_approx(X1, X2, Z, S, F):
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax = Axes3D(figure())
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax.plot_surface(X1,X2,Z, rstride=1, cstride=1,
+\end_layout
+
+\begin_layout Plain Layout
+
+            facecolors=fc_alpha(norm01(Z), 1 - .975*(S / S.max())))
+\end_layout
+
+\begin_layout Plain Layout
+
+    E = absolute(F - Z)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax.plot_surface(X1,X2,F, rstride=1, cstride=1,
+\end_layout
+
+\begin_layout Plain Layout
+
+            facecolors=fc_alpha(ones_like(F), .1*(E / E.max()), cm.Blues))
+\end_layout
+
+\begin_layout Plain Layout
+
+    zlo = 2 * ax.get_zlim()[0]; ax.set_zlim(bottom=zlo)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax.contour(X1,X2,Z,20, offset=zlo)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax.contour(X1,X2,F,20, offset=zlo, linestyles='dotted', linewidths=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return ax
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+N1 = 60; N2 = 30
+\end_layout
+
+\begin_layout Plain Layout
+
+D,D1,D2 = grid2d(0,10,5, 0,5,4) # training data inputs
+\end_layout
+
+\begin_layout Plain Layout
+
+Y = sin(D[:,0]) + sin(D[:,1])   #    "      "   outputs
+\end_layout
+
+\begin_layout Plain Layout
+
+T,X1,X2 = grid2d(0,10,N1, 0,5,N2) # test points
+\end_layout
+
+\begin_layout Plain Layout
+
+mean,var = mvg_cond(D, Y, T)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Z = mean.reshape(N1,N2).T
+\end_layout
+
+\begin_layout Plain Layout
+
+V = var.reshape(N1,N2).T; S = sqrt(V)
+\end_layout
+
+\begin_layout Plain Layout
+
+F = sin(X1) + sin(X2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+plot(D[:,0], D[:,1], 'x')
+\end_layout
+
+\begin_layout Plain Layout
+
+contour(X1,X2,Z,20)
+\end_layout
+
+\begin_layout Plain Layout
+
+contour(X1,X2,F,20, linestyles='dotted', linewidths=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+plot_2d_approx(X1, X2, Z, S, F)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_29_1.png
+	scale 50
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_29_2.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The solid contours give the predictive mean and the dashed contours give
+ the true objective function.
+ On the right, the colourful surface gives the predictive mean, with transparent
+ regions indicating large predictive variance (uncertainty).
+ The ghosted blue surface shows the objective function, and is more opaque
+ in regions where it differs significantly to the predictive mean.
+\end_layout
+
+\begin_layout Section
+Expected Improvement
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def EI(mean, sd, maxpt):
+\end_layout
+
+\begin_layout Plain Layout
+
+    mean = asarray(mean); sd = asarray(sd); maxpt = asscalar(maxpt)
+\end_layout
+
+\begin_layout Plain Layout
+
+    Z = (mean - maxpt) / sd
+\end_layout
+
+\begin_layout Plain Layout
+
+    ei = (mean - maxpt) * norm.cdf(Z) + sd * norm.pdf(Z)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return nan_to_num(ei)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+GPO-EI in 1-D
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def gpgo_ei_1d(f, xs, ts, showit=True, noise=0.001):
+\end_layout
+
+\begin_layout Plain Layout
+
+    xs = list(xs); ys = map(f,xs)
+\end_layout
+
+\begin_layout Plain Layout
+
+    mei = Inf # maximum expected improvement
+\end_layout
+
+\begin_layout Plain Layout
+
+    while mei > noise:
+\end_layout
+
+\begin_layout Plain Layout
+
+        mean,var = mvg_cond(xs,ys,ts)
+\end_layout
+
+\begin_layout Plain Layout
+
+        sd = sqrt(var)
+\end_layout
+
+\begin_layout Plain Layout
+
+        ei = EI(mean, sd, max(ys))
+\end_layout
+
+\begin_layout Plain Layout
+
+        mei = max(ei); t = ts[argmax(ei)]
+\end_layout
+
+\begin_layout Plain Layout
+
+        if showit: # visualisation
+\end_layout
+
+\begin_layout Plain Layout
+
+            plot(xs,ys,'x')
+\end_layout
+
+\begin_layout Plain Layout
+
+            errbars(ts, mean, sd)
+\end_layout
+
+\begin_layout Plain Layout
+
+            plot(ts,f(ts),':')
+\end_layout
+
+\begin_layout Plain Layout
+
+            plot(ts, ei, 'r')
+\end_layout
+
+\begin_layout Plain Layout
+
+            plot(ts, ei/mei, 'r:')
+\end_layout
+
+\begin_layout Plain Layout
+
+            plot(t, mei, 'rx')
+\end_layout
+
+\begin_layout Plain Layout
+
+            show()
+\end_layout
+
+\begin_layout Plain Layout
+
+        xs.append(t); ys.append(f(t))
+\end_layout
+
+\end_inset
+
+ In the plots in this section, the solid black line gives the current predictive
+ mean of the GP, and the dashed blue lines are two predictive standard deviation
+s above and below.
+ The dotted green line is the true objective function.
+ The red lines give the current EI, with the solid line to scale, and the
+ dotted line enlarged for greater visibility.
+ The red cross shows the location of maximal EI, where the next sample will
+ be taken.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Objective function 
+\begin_inset Formula $y=\sin x$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+gpgo_ei_1d(sin, [0,10], linspace(0,10,101))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_36_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Objective function sampled from a GP
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+gpgo_ei_1d(GPmem(1), [0,10], linspace(0,10,101))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_38_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+GPO-EI in 2-D
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def gpgo_ei_2d(f, D, N1=60, N2=30, showit=True, noise=0.001):
+\end_layout
+
+\begin_layout Plain Layout
+
+    D = list(D); Y = list(f(D))
+\end_layout
+
+\begin_layout Plain Layout
+
+    mei = Inf # maximum expected improvement
+\end_layout
+
+\begin_layout Plain Layout
+
+    while mei > noise:
+\end_layout
+
+\begin_layout Plain Layout
+
+        T,X1,X2 = grid2d(0,D[1][0],N1, 0,D[1][1],N2) # test points
+\end_layout
+
+\begin_layout Plain Layout
+
+        mean,var = mvg_cond(asarray(D), ascolumn(Y), T)
+\end_layout
+
+\begin_layout Plain Layout
+
+        sd = sqrt(var)
+\end_layout
+
+\begin_layout Plain Layout
+
+        
+\end_layout
+
+\begin_layout Plain Layout
+
+        ei = EI(mean, sd, max(Y))
+\end_layout
+
+\begin_layout Plain Layout
+
+        mei = max(ei)
+\end_layout
+
+\begin_layout Plain Layout
+
+        t = T[argmax(ei)]
+\end_layout
+
+\begin_layout Plain Layout
+
+        
+\end_layout
+
+\begin_layout Plain Layout
+
+        if showit:
+\end_layout
+
+\begin_layout Plain Layout
+
+            Z = mean.reshape(N1,N2).T
+\end_layout
+
+\begin_layout Plain Layout
+
+            V = var.reshape(N1,N2).T; S = sqrt(V)
+\end_layout
+
+\begin_layout Plain Layout
+
+            F = f(T).reshape(N1,N2).T
+\end_layout
+
+\begin_layout Plain Layout
+
+            E = absolute(F - Z)
+\end_layout
+
+\begin_layout Plain Layout
+
+            
+\end_layout
+
+\begin_layout Plain Layout
+
+            ax = plot_2d_approx(X1, X2, Z, S, F)
+\end_layout
+
+\begin_layout Plain Layout
+
+            zlo = ax.get_zlim()[0]
+\end_layout
+
+\begin_layout Plain Layout
+
+            ax.plot(asarray(D)[:,0], asarray(D)[:,1], zlo, 'o')
+\end_layout
+
+\begin_layout Plain Layout
+
+            ax.plot([t[0]], [t[1]], zlo, 'or')
+\end_layout
+
+\begin_layout Plain Layout
+
+            ax.contour(X1,X2,Z,20, offset=zlo)
+\end_layout
+
+\begin_layout Plain Layout
+
+            ax.contour(X1,X2,F,20, offset=zlo, linestyles='dotted', linewidths=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+            show()
+\end_layout
+
+\begin_layout Plain Layout
+
+        
+\end_layout
+
+\begin_layout Plain Layout
+
+        D.append(t); Y.append(f(atleast_2d(t)))
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+ The plots in this section follow the same conventions as those shown earlier.
+ Unfortunately, EI is not shown in order to reduce the amount of clutter,
+ but one can draw an analogy to the 1-D plots given earlier --- EI is zero
+ immediately surrounding previous samples (blue circles), and large in regions
+ that have large mean and/or high variance (transparent surface).
+ The red circles show the location of the maximal EI.
+\end_layout
+
+\begin_layout Subsubsection
+Objective function 
+\begin_inset Formula $z=\sin x+\sin y$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def sinsin(X):
+\end_layout
+
+\begin_layout Plain Layout
+
+    X = atleast_2d(X)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return sin(X[:,0]) + sin(X[:,1])
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+gpgo_ei_2d(sinsin, [[0,0], [10,5]])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_11}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_12}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_13}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_14}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_15}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_16}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_17}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_18}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_19}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_20}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_21}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_22}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_23}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_24}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_25}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_26}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_27}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_28}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_29}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_30}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_31}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_32}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_33}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_34}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_35}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_42_36}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Objective function sampled from a GP
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Python,showstringspaces=false"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+gpgo_ei_2d(GPmem(2), [[0,0], [10,5]], 30,15)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_11}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_12}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_13}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_14}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_15}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_16}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_17}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_18}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_19}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_20}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_21}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_22}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_23}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_24}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_25}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_26}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_27}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_28}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_29}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_30}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics[scale=0.5]{gpo_ipynb_files/gpo_ipynb_44_31}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

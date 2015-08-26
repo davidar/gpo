@@ -1,0 +1,3 @@
+Very rough code for performing Gaussian process optimisation via Expected improvement.
+
+It's likely to break if you try to use it for something serious :)

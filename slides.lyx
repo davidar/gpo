@@ -1,0 +1,995 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass beamer
+\use_default_options true
+\maintain_unincluded_children false
+\language british
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Optimising High-Dimensional Black-Box Functions with Gaussian Processes
+\end_layout
+
+\begin_layout Author
+David A Roberts
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\E}{\operatorname{\mathbb{E}}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Introduction
+\end_layout
+
+\begin_layout Itemize
+maximise 
+\emph on
+objective function
+\emph default
+, by sampling its value at a number of points
+\end_layout
+
+\begin_layout Itemize
+assumptions about structure of objective function (
+\begin_inset Quotes eld
+\end_inset
+
+smoothness
+\begin_inset Quotes erd
+\end_inset
+
+, etc)
+\end_layout
+
+\begin_layout Itemize
+goals (e.g.
+ quality of maximum vs number of evaluations)
+\end_layout
+
+\begin_layout Itemize
+Bayesian
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+assumptions = prior distribution (e.g.
+ Gaussian process)
+\end_layout
+
+\begin_layout Itemize
+goals = utility (e.g.
+ maximum function value found so far)
+\end_layout
+
+\begin_layout Itemize
+maximise expected utility wrt posterior
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+difficulty (depends on priorities)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+number of FEs required (tends to scale with dimensionality)
+\end_layout
+
+\begin_layout Itemize
+model-based computation
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Prior (1D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_17_0.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Prior (2D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_19_2.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Prior (2D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_19_1.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Posterior (1D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_26_0.png
+	scale 80
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Posterior (1D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_26_1.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GP Posterior (2D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_29_2.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Model
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{alignat*}{2}
+ & \mathbf{maximise} & \E & \, U\\
+ & \mathbf{subject\ to} & f & \sim\mathcal{N}(0,K_{\text{SE}})\\
+ &  & U & =f(x^{*})\\
+ &  & y_{t} & =f(x_{t}),\quad t\leq N\\
+\\
+ & \mathbf{with\ actions} & x_{t} & \in\mathbb{R}^{D},\quad t\leq N\\
+ &  & x^{*} & \in\{x_{t}\}\\
+ & \mathbf{and\ observations}\qquad & y_{t} & \in\mathbb{R},\quad t\leq N
+\end{alignat*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Pause
+
+\end_layout
+
+\begin_layout Itemize
+computational/FE costs?
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Implementation
+\end_layout
+
+\begin_layout Itemize
+computing Gaussian conditional distributions (inverting large covariance
+ matrices)
+\end_layout
+
+\begin_layout Itemize
+inferring unknowns (GP hyperparams --- ML, MC, etc)
+\end_layout
+
+\begin_layout Itemize
+approximate decision policy, selecting actions
+\end_layout
+
+\begin_layout Itemize
+non-trivial, as model is quite abstract
+\end_layout
+
+\begin_layout Itemize
+computation vs uncertainty
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Matrix Inverse
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathcal{O}(N\cdot N^{3})$
+\end_inset
+
+ total
+\end_layout
+
+\begin_layout Itemize
+sparsity constraints (Markov network)
+\end_layout
+
+\begin_layout Itemize
+low-rank approximations, hierarchical decomposition (n-body problem)
+\end_layout
+
+\begin_layout Itemize
+active sets (ignore predictable observations)
+\end_layout
+
+\begin_layout Itemize
+incremental updates
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Numerical Stability
+\end_layout
+
+\begin_layout Itemize
+assume more noise than expected (even if observations are noise-free)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+numerical noise
+\end_layout
+
+\begin_layout Itemize
+cf.
+ ridge regression
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Approximate Decisions
+\end_layout
+
+\begin_layout Itemize
+optimal decisions are hard
+\end_layout
+
+\begin_layout Itemize
+pretend every sample is the last --- maximise expected improvement
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+more accurate approximations possible
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+optimiser within an optimiser
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+general-purpose: DIRECT, CG, CMA-ES, etc
+\end_layout
+
+\begin_layout Itemize
+but EI isn't a black-box
+\end_layout
+
+\begin_layout Itemize
+same dimensionality as objective function
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO (1D)
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<1>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<2>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<3>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<4>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<5>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<6>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<7>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<8>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<9>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<10>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<11>[scale=0.8]{gpo_ipynb_files/gpo_ipynb_38_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO (2D)
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{center}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<1>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_0}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<2>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<3>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<4>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_3}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<5>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_4}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<6>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_5}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<7>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_6}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<8>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_7}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<9>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_8}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<10>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_9}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<11>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_10}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<12>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_11}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<13>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_12}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<14>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_13}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<15>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_14}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<16>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_15}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<17>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_16}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<18>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_17}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<19>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_18}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<20>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_19}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<21>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_20}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<22>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_21}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<23>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_22}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<24>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_23}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<25>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_24}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<26>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_25}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<27>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_26}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<28>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_27}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<29>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_28}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<30>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_29}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<31>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_30}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+includegraphics<32>[scale=0.7]{gpo_ipynb_files/gpo_ipynb_44_31}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{center}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (1D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_1.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (2D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_3.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (5D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_5.png
+	scale 80
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (10D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_8.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (20D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_10.png
+	scale 80
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (50D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_12.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GPO vs SA (100D)
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename gpo_ipynb_files/gpo_ipynb_49_14.png
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Conclusions
+\end_layout
+
+\begin_layout Itemize
+works well for 
+\begin_inset Quotes eld
+\end_inset
+
+small
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Formula $N$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+scales to high dimensions
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+ldots
+\end_layout
+
+\end_inset
+
+ but some difficulty scaling with 
+\begin_inset Formula $N$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+computationally expensive without a clever implementation
+\end_layout
+
+\begin_layout Itemize
+one size doesn't fit all --- different problems, different assumptions
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+if assumptions (or approximations) unsuitable for problem, GPO may quickly
+ run out of promising samples
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+scaling to larger 
+\begin_inset Formula $N$
+\end_inset
+
+ (matrix inversion)
+\end_layout
+
+\begin_layout Itemize
+optimising EI (or equivalent)
+\end_layout
+
+\begin_layout Itemize
+handling different utilities, observation noise
+\end_layout
+
+\begin_layout Itemize
+multi-step lookahead
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document
